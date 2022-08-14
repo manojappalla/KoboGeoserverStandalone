@@ -9,13 +9,13 @@ from PyQt5.QtCore import *
 from Auth import Auth
 from Geoserver import Geoserver
 
-config = configparser.ConfigParser()
-config.read('KoboAuth.ini')
+kobo = configparser.ConfigParser()
+kobo.read('KoboAuth.ini')
 
-url_kobo = config['Kobo Credentials']['url']
-username_kobo = config['Kobo Credentials']['username']
-password_kobo = config['Kobo Credentials']['password']
-last_submission_kobo = config['Kobo Credentials']['last submission']
+url_kobo = kobo['Kobo Credentials']['url']
+username_kobo = kobo['Kobo Credentials']['username']
+password_kobo = kobo['Kobo Credentials']['password']
+last_submission_kobo = kobo['Kobo Credentials']['last submission']
 
 QgsApplication.setPrefixPath("/Applications/QGIS-LTR.app/Contents/Resources", True)
 qgs = QgsApplication([], False)
@@ -407,10 +407,10 @@ class Import:
                 print ('task has returned some data')
                 self.updateLayer(self.layer,remoteTable,self.geoField)
                 print("lastID is",lastID)
-                config['Kobo Credentials']['last submission'] = str(lastID)
+                kobo['Kobo Credentials']['last submission'] = str(lastID)
                 with open('kobo_auth.ini', 'w') as configfile:
-                    config.write(configfile)
-                print(config['Kobo Credentials']['last submission'])
+                    kobo.write(configfile)
+                print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
         else:
             print("Not able to collect data.")
@@ -552,16 +552,16 @@ if user_choice == 'y':
     username = input("Please enter username: ")
     password = input("Please enter password: ")
 
-    config['Kobo Credentials']['url'] = url
-    config['Kobo Credentials']['username'] = username
-    config['Kobo Credentials']['password'] = password
+    kobo['Kobo Credentials']['url'] = url
+    kobo['Kobo Credentials']['username'] = username
+    kobo['Kobo Credentials']['password'] = password
     with open('kobo_auth.ini', 'w') as configfile:
-        config.write(configfile)
+        kobo.write(configfile)
 
 elif user_choice == 'n':
-    url = config['Kobo Credentials']['url']
-    username = config['Kobo Credentials']['username']
-    password = config['Kobo Credentials']['password']
+    url = kobo['Kobo Credentials']['url']
+    username = kobo['Kobo Credentials']['username']
+    password = kobo['Kobo Credentials']['password']
 
 """
 *************************************************************************************************
