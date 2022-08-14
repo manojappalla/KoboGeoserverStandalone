@@ -10,7 +10,7 @@ from Auth import Auth
 from Geoserver import Geoserver
 
 config = configparser.ConfigParser()
-config.read('kobo_auth.ini')
+config.read('KoboAuth.ini')
 
 url_kobo = config['Kobo Credentials']['url']
 username_kobo = config['Kobo Credentials']['username']
