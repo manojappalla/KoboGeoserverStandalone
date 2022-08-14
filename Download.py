@@ -53,13 +53,13 @@ class Import:
 
 
     def getValue(self,key, newValue = None):
-        print("searching in setting parameter",key)
+        # print("searching in setting parameter",key)
         for row in range (0,self.rowCount()):
-            print(" parameter is",self.item(row,0).text())
+            # print(" parameter is",self.item(row,0).text())
             if self.item(row,0).text() == key:
                 if newValue:
                     self.item(row, 1).setText(str(newValue))
-                    print("setting new value",newValue)
+                    # print("setting new value",newValue)
                     self.setup() #store to settings
                 value=self.item(row,1).text().strip()
                 if value:
@@ -114,7 +114,7 @@ class Import:
         if turl:
             url=turl+'api/v2/assets'
         else:
-            print("Enter correct url.")
+            # print("Enter correct url.")
             return None, None
 
         para={'format':'json'}
@@ -127,10 +127,10 @@ class Import:
             for form in forms['results']:
                 if form['asset_type'] == 'survey' and form['deployment__active'] == True:
                     keyDict[form['name']] = form['uid']
-            return keyDict, response
+            return keyDict
         except:
             # self.iface.messageBar().pushCritical(self.tag, self.tr("Invalid url username or password"))
-            print("Invalid username or password")
+            # print("Invalid username or password")
             return None, None
 
 
@@ -155,13 +155,14 @@ class Import:
         if turl:
             url=turl+'/assets/'+selectedForm
         else:
-            print("URL is not entered.")
+            # print("URL is not entered.")
+            pass
         para={'format':'xml'}
         requests.packages.urllib3.disable_warnings()
         try:
             response= requests.request('GET',url,proxies=self.getproxiesConf(),auth=(user,password),verify=False,params=para)
         except:
-            print("Invalid url,username or password")
+            # print("Invalid url,username or password")
             return
         if response.status_code==200:
             xml=response.content
@@ -170,11 +171,11 @@ class Import:
             layer.setName(self.layer_name)
             self.user=user
             self.password=password
-            print("calling collect data")
+            # print("calling collect data")
             self.collectData(layer,selectedForm,doImportData,self.layer_name,self.version,self.geoField)
         else:
-            print("not able to connect to server")
-
+            # print("not able to connect to server")
+            pass
 
     def updateLayerXML(self,layer,xml):
 
@@ -234,7 +235,7 @@ class Import:
                         isHidden= False
                         break
                 if isHidden:
-                    print('Reached Hidden')
+                    # print('Reached Hidden')
                     config['type']='Hidden'
             else:
                 geoField=fieldName
@@ -261,7 +262,7 @@ class Import:
 
             if field.name()[:10] == text[:10]:
                 flag = False
-                print("not writing fields")
+                # print("not writing fields")
         if flag:
             uuidField = QgsField(text, q_type)
             if q_type == QVariant.String:
@@ -271,7 +272,7 @@ class Import:
         fId = layer.dataProvider().fieldNameIndex(text)
         try:
             if config['type'] == 'Hidden':
-                print('setting hidden widget')
+                # print('setting hidden widget')
                 layer.setEditorWidgetSetup(fId, QgsEditorWidgetSetup("Hidden", config))
                 return
         except Exception as e:
@@ -279,9 +280,9 @@ class Import:
             pass
         if config == {}:
             return
-        print('now setting external resource widget')
+        # print('now setting external resource widget')
         layer.setEditorWidgetSetup(fId, QgsEditorWidgetSetup("ExternalResource", config))
-        print("done")
+        # print("done")
 
 
 
@@ -298,10 +299,12 @@ class Import:
         #            return
         def testc(exception, result):
             if exception:
-                print("task raised exception")
+                # print("task raised exception")
+                pass
             else:
-                print("Success", result[0])
-                print("task returned")
+                # print("Success", result[0])
+                # print("task returned")
+                pass
 
         self.updateFields(layer)
         self.layer = layer
@@ -313,7 +316,7 @@ class Import:
         self.isImportData = doImportData
         self.topElement = topElement
         self.version = version
-        print("task is being created")
+        # print("task is being created")
         # self.task1 = QgsTask.fromFunction('downloading data', self.getTable, on_finished=self.comp)
         # print("task is created")
         # print("task status1 is  ", self.task1.status())
@@ -328,7 +331,7 @@ class Import:
 
     def getTable(self):
         try:
-            print("get table started")
+            # print("get table started")
             # task.setProgress(10.0)
             #requests.packages.urllib3.disable_warnings()
             url=self.turl
@@ -344,25 +347,25 @@ class Import:
                 try:
                     response = requests.get(urlData,proxies=self.proxyConfig,auth=(self.user,self.password),params=para,verify=False)
                 except:
-                    print("not able to connect to server",urlData)
+                    # print("not able to connect to server",urlData)
                     return {'response':response, 'table':table}
-                print('requesting url is'+response.url)
+                # print('requesting url is'+response.url)
             else:
                 query_param={"_id": {"$gt":int(lastSub)}}
                 jsonquery=json.dumps(query_param)
-                print('query_param is'+jsonquery)
+                # print('query_param is'+jsonquery)
                 para={'query':jsonquery,'format':'json'}
                 try:
                     response = requests.get(urlData,proxies=self.proxyConfig,auth=(self.user,self.password),params=para,verify=False)
-                    print('requesting url is'+response.url)
+                    # print('requesting url is'+response.url)
                 except:
-                    print("not able to connect to server",urlData)
+                    # print("not able to connect to server",urlData)
                     return {'response':response, 'table':table,'lastID':None}
             #task.setProgress(50)
             data=response.json()
             #print(data,type(data))
             subList=[]
-            print("no of submissions are",data['count'])
+            # print("no of submissions are",data['count'])
             if data['count']==0:
                 return {'response':response, 'table':table}
             for submission in data['results']:
@@ -374,9 +377,9 @@ class Import:
                 #subTime_datetime=datetime.datetime.strptime(subTime,'%Y-%m-%dT%H:%M:%S')
                 subList.append(subID)
                 for key in list(submission):
-                    print(key)
+                    # print(key)
                     if key == self.geoField:
-                        print (self.geoField)
+                        # print (self.geoField)
                         continue
                     if key not in self.fields:
                         submission.pop(key)
@@ -387,10 +390,10 @@ class Import:
             #task.setProgress(90)
             if len(subList)>0:
                 lastSubmission=max(subList)
-            print({'response':response, 'table':table,'lastID':lastSubmission})
+            # print({'response':response, 'table':table,'lastID':lastSubmission})
             return {'response':response, 'table':table,'lastID':lastSubmission}
         except Exception as e:
-            print("exception occured in gettable",e)
+            # print("exception occured in gettable",e)
             return {'response':None, 'table':None,'lastID':None}
 
 
@@ -399,18 +402,18 @@ class Import:
         #     print("exception in task execution")
         response=result['response']
         remoteTable=result['table']
-        print(remoteTable)
+        # print(remoteTable)
         lastID=result['lastID']
         if response.status_code == 200:
-            print ('after task finished before update layer')
+            # print ('after task finished before update layer')
             if remoteTable:
-                print ('task has returned some data')
+                # print ('task has returned some data')
                 self.updateLayer(self.layer,remoteTable,self.geoField)
-                print("lastID is",lastID)
+                # print("lastID is",lastID)
                 kobo['Kobo Credentials']['last submission'] = str(lastID)
                 with open('KoboAuth.ini', 'w') as configfile:
                     kobo.write(configfile)
-                print(kobo['Kobo Credentials']['last submission'])
+                # print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
         else:
             print("Not able to collect data.")
@@ -430,26 +433,27 @@ class Import:
 
         newQgisFeatures = []
         fieldError = None
-        print('geofield is', geoField)
+        # print('geofield is', geoField)
         for odkFeature in dataDict:
             # print(odkFeature)
             id = None
             try:
                 id = odkFeature['ODKUUID']
-                print('odk id is', id)
+                # print('odk id is', id)
             except:
-                print('error in reading ODKUUID')
+                # print('error in reading ODKUUID')
+                pass
             try:
                 if not id in uuidList:
                     qgisFeature = QgsFeature()
-                    print("odkFeature", odkFeature)
+                    # print("odkFeature", odkFeature)
                     wktGeom = self.guessWKTGeomType(odkFeature[geoField])
-                    print(wktGeom)
+                    # print(wktGeom)
                     if wktGeom[:3] != layerGeo[:3]:
-                        print(wktGeom, 'is not matching' + layerGeo)
+                        # print(wktGeom, 'is not matching' + layerGeo)
                         continue
                     qgisGeom = QgsGeometry.fromWkt(wktGeom)
-                    print('geom is', qgisGeom)
+                    # print('geom is', qgisGeom)
                     qgisFeature.setGeometry(qgisGeom)
                     qgisFeature.initAttributes(len(QgisFieldsList))
                     for fieldName, fieldValue in odkFeature.items():
@@ -461,12 +465,14 @@ class Import:
 
                     newQgisFeatures.append(qgisFeature)
             except Exception as e:
-                print('unable to create', e)
+                # print('unable to create', e)
+                pass
         try:
             with edit(layer):
                 layer.addFeatures(newQgisFeatures)
         except:
-            print("Stop layer editing and import again")
+            # print("Stop layer editing and import again")
+            pass
         self.processingLayer = None
 
 
@@ -479,10 +485,10 @@ class Import:
             if 'UUID' in field:
                 uuidFieldName =field
         if uuidFieldName:
-            print(uuidFieldName)
+            # print(uuidFieldName)
             for qgisFeature in lyr.getFeatures():
                 uuidList.append(qgisFeature[uuidFieldName])
-        print (uuidList)
+        # print (uuidList)
         return uuidList
 
 
@@ -587,7 +593,7 @@ except:
 
 layer = QgsVectorLayer("/Users/saimanojappalla/Desktop/PilotProject/KoboGeoserver/kobogeoserver-standalone/shapefile/new.shp", "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
-selected_form = input("Please enter name of the form: ")
+selected_form = kobo['Forms List']['last used']
 data.importData(layer, selected_form)
 
 
