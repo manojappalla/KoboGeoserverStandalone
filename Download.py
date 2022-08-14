@@ -408,7 +408,7 @@ class Import:
                 self.updateLayer(self.layer,remoteTable,self.geoField)
                 print("lastID is",lastID)
                 kobo['Kobo Credentials']['last submission'] = str(lastID)
-                with open('kobo_auth.ini', 'w') as configfile:
+                with open('KoboAuth.ini', 'w') as configfile:
                     kobo.write(configfile)
                 print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
@@ -541,34 +541,35 @@ class Import:
                             SETTING UP THE URL, USERNAME, AND PASSWORD
 *************************************************************************************************
 """
-user_choice = input("Please enter 'y' if you want to change your kobo credentials or 'n' if you don't want to change: ")
+# user_choice = input("Please enter 'y' if you want to change your kobo credentials or 'n' if you don't want to change: ")
+#
+# url = None
+# username = None
+# password = None
+#
+# if user_choice == 'y':
+#     url = input("Please enter url: ")
+#     username = input("Please enter username: ")
+#     password = input("Please enter password: ")
+#
+#     kobo['Kobo Credentials']['url'] = url
+#     kobo['Kobo Credentials']['username'] = username
+#     kobo['Kobo Credentials']['password'] = password
+#     with open('KoboAuth.ini', 'w') as configfile:
+#         kobo.write(configfile)
+#
+# elif user_choice == 'n':
 
-url = None
-username = None
-password = None
-
-if user_choice == 'y':
-    url = input("Please enter url: ")
-    username = input("Please enter username: ")
-    password = input("Please enter password: ")
-
-    kobo['Kobo Credentials']['url'] = url
-    kobo['Kobo Credentials']['username'] = username
-    kobo['Kobo Credentials']['password'] = password
-    with open('kobo_auth.ini', 'w') as configfile:
-        kobo.write(configfile)
-
-elif user_choice == 'n':
-    url = kobo['Kobo Credentials']['url']
-    username = kobo['Kobo Credentials']['username']
-    password = kobo['Kobo Credentials']['password']
+# url = kobo['Kobo Credentials']['url']
+# username = kobo['Kobo Credentials']['username']
+# password = kobo['Kobo Credentials']['password']
 
 """
 *************************************************************************************************
                                 TESTING getFormList
 *************************************************************************************************
 """
-data = Import(url, username, password)
+data = Import(url_kobo, username_kobo, password_kobo)
 
 try:
     print(data.getFormList())
