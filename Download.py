@@ -578,7 +578,7 @@ class Import:
 data = Import(url_kobo, username_kobo, password_kobo)
 
 try:
-    print(data.getFormList())
+    data.getFormList()
 except:
     print("Invalid credentials entered")
 
