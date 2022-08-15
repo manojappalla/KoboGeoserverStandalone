@@ -1,3 +1,4 @@
+# IMPORT ALL THE NECESSARY LIBRARIES
 import os
 import requests
 import configparser
@@ -9,6 +10,7 @@ from PyQt5.QtCore import *
 from Auth import Auth
 from Geoserver import Geoserver
 
+# KOBO VARIABLES
 kobo = configparser.ConfigParser()
 kobo.read('KoboAuth.ini')
 
@@ -16,11 +18,28 @@ url_kobo = kobo['Kobo Credentials']['url']
 username_kobo = kobo['Kobo Credentials']['username']
 password_kobo = kobo['Kobo Credentials']['password']
 last_submission_kobo = kobo['Kobo Credentials']['last submission']
+form_feature_count = 0
 
+# GEOSERVER VARIABLES
+config = configparser.ConfigParser()
+config.read('GeoserverAuth.ini')
+
+url_geoserver = config['Geoserver Credentials']['Url']
+username_geoserver = config['Geoserver Credentials']['Username']
+password_geoserver = config['Geoserver Credentials']['password']
+shp_workspace_name = config['Shapefile Workspace Store']['workspace_name']
+shp_store_name = config['Shapefile Workspace Store']['store_name']
+shp_path = config['Shapefile Workspace Store']['shp_path']
+no_of_times_published = int(config['Shapefile Workspace Store']['publish_count'])
+layer_name = shp_path.split('/')[-1].split('.')[0]
+
+
+# INITIALIZE STANDALONE APPLICATION
 QgsApplication.setPrefixPath("/Applications/QGIS-LTR.app/Contents/Resources", True)
 qgs = QgsApplication([], False)
 qgs.initQgis()
 
+# START WRITING THE FUNCTIONS
 def qtype(odktype):
     if odktype == 'binary':
         return QVariant.String,{'DocumentViewer': 2, 'DocumentViewerHeight': 0, 'DocumentViewerWidth': 0, 'FileWidget': True, 'FileWidgetButton': True, 'FileWidgetFilter': '', 'PropertyCollection': {'name': None, 'properties': {}, 'type': 'collection'}, 'RelativeStorage': 0, 'StorageMode': 0}
@@ -39,6 +58,8 @@ def qtype(odktype):
     else:
         return (QVariant.String),{}
 
+
+# CREATE THE IMPORT CLASS
 class Import:
 
     def __init__(self, kobo_url, kobo_username, kobo_password):
@@ -366,6 +387,8 @@ class Import:
             #print(data,type(data))
             subList=[]
             # print("no of submissions are",data['count'])
+            global form_feature_count
+            form_feature_count = data['count']
             if data['count']==0:
                 return {'response':response, 'table':table}
             for submission in data['results']:
@@ -468,8 +491,18 @@ class Import:
                 # print('unable to create', e)
                 pass
         try:
+            geo = Geoserver(url_geoserver, username_geoserver, password_geoserver)
             with edit(layer):
                 layer.addFeatures(newQgisFeatures)
+
+            # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
+            if (form_feature_count >= 2 and no_of_times_published == 0):
+                layer_name = shp_path.split('/')[-1].split('.')[0]
+                geo.create_datastore(name=shp_store_name, path=shp_path, workspace=shp_workspace_name)
+                geo.publish_featurestore(workspace=shp_workspace_name, store_name=shp_store_name, pg_table=layer_name)
+            config['Shapefile Workspace Store']['publish_count'] = str(1)
+            with open('GeoserverAuth.ini', 'w') as configfile:
+                config.write(configfile)
         except:
             # print("Stop layer editing and import again")
             pass
@@ -591,7 +624,7 @@ except:
 
 # TODO: Create one empty shapefile and pass it as an argument to the importData function
 
-layer = QgsVectorLayer("/Users/saimanojappalla/Desktop/PilotProject/KoboGeoserver/kobogeoserver-standalone/shapefile/new.shp", "new", "ogr")
+layer = QgsVectorLayer(shp_path, "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
 selected_form = kobo['Forms List']['last used']
 data.importData(layer, selected_form)
