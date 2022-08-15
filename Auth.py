@@ -23,7 +23,7 @@ class Auth:
         """
 
         config = configparser.ConfigParser()
-        config.read('geoserver_auth.ini')
+        config.read('GeoserverAuth.ini')
 
         url = config['Geoserver Credentials']['Url']
         username = config['Geoserver Credentials']['Username']
