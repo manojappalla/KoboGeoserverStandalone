@@ -509,3 +509,173 @@ class Geoserver:
         except Exception as e:
             return "Error: {}".format(e)
 
+    def create_featurestore(
+            self,
+            store_name: str,
+            workspace: Optional[str] = None,
+            db: str = "postgres",
+            host: str = "localhost",
+            port: int = 5432,
+            schema: str = "public",
+            pg_user: str = "postgres",
+            pg_password: str = "admin",
+            overwrite: bool = False,
+            expose_primary_keys: str = "false",
+            description: Optional[str] = None,
+            evictor_run_periodicity: Optional[int] = 300,
+            max_open_prepared_statements: Optional[int] = 50,
+            encode_functions: Optional[str] = "false",
+            primary_key_metadata_table: Optional[str] = None,
+            batch_insert_size: Optional[int] = 1,
+            preparedstatements: Optional[str] = "false",
+            loose_bbox: Optional[str] = "true",
+            estimated_extends: Optional[str] = "true",
+            fetch_size: Optional[int] = 1000,
+            validate_connections: Optional[str] = "true",
+            support_on_the_fly_geometry_simplification: Optional[str] = "true",
+            connection_timeout: Optional[int] = 20,
+            create_database: Optional[str] = "false",
+            min_connections: Optional[int] = 1,
+            max_connections: Optional[int] = 10,
+            evictor_tests_per_run: Optional[int] = 3,
+            test_while_idle: Optional[str] = "true",
+            max_connection_idle_time: Optional[int] = 300,
+    ):
+        """
+        Create PostGIS store for connecting postgres with geoserver.
+        Parameters
+        ----------
+        store_name : str
+        workspace : str, optional
+        db : str
+        host : str
+        port : int
+        schema : str
+        pg_user : str
+        pg_password : str
+        overwrite : bool
+        expose_primary_keys: str
+        description : str, optional
+        evictor_run_periodicity : str
+        max_open_prepared_statements : int
+        encode_functions : str
+        primary_key_metadata_table : str
+        batch_insert_size : int
+        preparedstatements : str
+        loose_bbox : str
+        estimated_extends : str
+        fetch_size : int
+        validate_connections : str
+        support_on_the_fly_geometry_simplification : str
+        connection_timeout : int
+        create_database : str
+        min_connections : int
+        max_connections : int
+        evictor_tests_per_run : int
+        test_while_idle : str
+        max_connection_idle_time : int
+        Notes
+        -----
+        After creating feature store, you need to publish it. See the layer publish guidline here: https://geoserver-rest.readthedocs.io/en/latest/how_to_use.html#creating-and-publishing-featurestores-and-featurestore-layers
+        """
+
+        url = "{}/rest/workspaces/{}/datastores".format(self.service_url, workspace)
+
+        headers = {"content-type": "text/xml"}
+
+        database_connection = """
+                <dataStore>
+                <name>{0}</name>
+                <description>{1}</description>
+                <connectionParameters>
+                <entry key="Expose primary keys">{2}</entry>
+                <entry key="host">{3}</entry>
+                <entry key="port">{4}</entry>
+                <entry key="user">{5}</entry>
+                <entry key="passwd">{6}</entry>
+                <entry key="dbtype">postgis</entry>
+                <entry key="schema">{7}</entry>
+                <entry key="database">{8}</entry>
+                <entry key="Evictor run periodicity">{9}</entry>
+                <entry key="Max open prepared statements">{10}</entry>
+                <entry key="encode functions">{11}</entry>
+                <entry key="Primary key metadata table">{12}</entry>
+                <entry key="Batch insert size">{13}</entry>
+                <entry key="preparedStatements">{14}</entry>
+                <entry key="Estimated extends">{15}</entry>
+                <entry key="fetch size">{16}</entry>
+                <entry key="validate connections">{17}</entry>
+                <entry key="Support on the fly geometry simplification">{18}</entry>
+                <entry key="Connection timeout">{19}</entry>
+                <entry key="create database">{20}</entry>
+                <entry key="min connections">{21}</entry>
+                <entry key="max connections">{22}</entry>
+                <entry key="Evictor tests per run">{23}</entry>
+                <entry key="Test while idle">{24}</entry>
+                <entry key="Max connection idle time">{25}</entry>
+                <entry key="Loose bbox">{26}</entry>
+                </connectionParameters>
+                </dataStore>
+                """.format(
+            store_name,
+            description,
+            expose_primary_keys,
+            host,
+            port,
+            pg_user,
+            pg_password,
+            schema,
+            db,
+            evictor_run_periodicity,
+            max_open_prepared_statements,
+            encode_functions,
+            primary_key_metadata_table,
+            batch_insert_size,
+            preparedstatements,
+            estimated_extends,
+            fetch_size,
+            validate_connections,
+            support_on_the_fly_geometry_simplification,
+            connection_timeout,
+            create_database,
+            min_connections,
+            max_connections,
+            evictor_tests_per_run,
+            test_while_idle,
+            max_connection_idle_time,
+            loose_bbox,
+        )
+
+        r = None
+        try:
+            if overwrite:
+                url = "{}/rest/workspaces/{}/datastores/{}".format(
+                    self.service_url, workspace, store_name
+                )
+
+                r = self._requests(
+                    "put",
+                    url,
+                    data=database_connection,
+                    headers=headers,
+                )
+
+                if r.status_code not in [200, 201]:
+                    return "{}: Datastore can not be updated. {}".format(
+                        r.status_code, r.content
+                    )
+            else:
+                r = self._requests(
+                    "post",
+                    url,
+                    data=database_connection,
+                    headers=headers,
+                )
+
+                if r.status_code not in [200, 201]:
+                    return "{}: Data store can not be created! {}".format(
+                        r.status_code, r.content
+                    )
+
+        except Exception as e:
+            return "Error: {}".format(e)
