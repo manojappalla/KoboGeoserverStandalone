@@ -487,9 +487,11 @@ class Import:
                                 fieldError = fieldName
 
                     newQgisFeatures.append(qgisFeature)
+
             except Exception as e:
                 # print('unable to create', e)
                 pass
+            # print(dataDict)
         try:
             geo = Geoserver(url_geoserver, username_geoserver, password_geoserver)
             with edit(layer):
