@@ -71,10 +71,10 @@ def qtype(odktype):
 # CREATE THE IMPORT CLASS
 class ImportKobo:
 
-    def __init__(self, kobo_url, kobo_username, kobo_password):
-        self.kobo_url = kobo_url
-        self.kobo_username = kobo_username
-        self.kobo_password = kobo_password
+    def __init__(self):
+        self.kobo_url = url_kobo
+        self.kobo_username = username_kobo
+        self.kobo_password = password_kobo
 
 
     def getAuth(self):
@@ -585,7 +585,7 @@ class ImportKobo:
                                KOBO ---> TESTING getFormList
 *************************************************************************************************
 """
-data_kobo = ImportKobo(url_kobo, username_kobo, password_kobo)
+data_kobo = ImportKobo()
 
 try:
     data_kobo.getFormList()
