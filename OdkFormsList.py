@@ -9,7 +9,7 @@ odk.read('OdkAuth.ini')
 url_odk = odk['Odk Credentials']['url']
 username_odk = odk['Odk Credentials']['username']
 password_odk = odk['Odk Credentials']['password']
-last_project_used_odk = odk['Projects ODK']['last used']
+last_project_used_odk = odk['Odk Credentials']['last used project']
 
 def getFormList():
     """Retrieves list of all forms using user entered credentials
@@ -50,9 +50,11 @@ def getFormList():
         return None, None
 
 list_of_forms = list(getFormList().items())
-
+odk[last_project_used_odk] = {}
+with open('OdkAuth.ini', 'w') as configfile:
+    odk.write(configfile)
 for list in list_of_forms:
     # print(list)
-    odk['Projects ODK'][list[0]] = list[1]
+    odk[last_project_used_odk][list[0]] = list[1]
     with open('OdkAuth.ini', 'w') as configfile:
         odk.write(configfile)
