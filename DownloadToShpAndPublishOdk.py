@@ -1,5 +1,7 @@
 # IMPORT ALL THE NECESSARY LIBRARIES
 import os
+import datetime
+
 import requests
 import configparser
 import xml.etree.ElementTree as ET
@@ -83,6 +85,38 @@ class ImportOdk():
         self.form_name = ""
         self.tag = "ODK Central"
 
+    def getAuth(self):
+        auth = requests.auth.HTTPDigestAuth(username_odk,password_odk)
+        return auth
+
+    def getproxiesConf(self):
+
+        """
+        This function is used to configure all the proxy settings.
+        :return:
+        """
+        s = QSettings()  # getting proxy from qgis options settings
+        proxyEnabled = s.value("proxy/proxyEnabled", "")
+        proxyType = s.value("proxy/proxyType", "")
+        proxyHost = s.value("proxy/proxyHost", "")
+        proxyPort = s.value("proxy/proxyPort", "")
+        proxyUser = s.value("proxy/proxyUser", "")
+        proxyPassword = s.value("proxy/proxyPassword", "")
+        if proxyEnabled == "true" and proxyType == 'HttpProxy':  # test if there are proxy settings
+            proxyDict = {
+                "http": "http://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort),
+                "https": "http://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort)
+            }
+            return proxyDict
+        else:
+            return None
+
+
+    """
+    *************************************************************************************************
+                                    PART-1
+    *************************************************************************************************
+    """
     def getFormList(self):
         """Retrieves list of all forms using user entered credentials
         Returns
@@ -175,7 +209,7 @@ class ImportOdk():
             print(xml)
             self.layer_name, self.version, self.geoField, self.fields = self.updateLayerXML(layer, xml)
             # layer.setName(self.layer_name)
-            # self.collectData(layer, selectedForm, doImportData, self.layer_name, self.version, self.geoField)
+            self.collectData(layer, selectedForm, doImportData, self.layer_name, self.version, self.geoField)
         else:
             print("not able to connect to server")
 
@@ -284,6 +318,145 @@ class ImportOdk():
         # print('now setting external resource widget')
         layer.setEditorWidgetSetup(fId, QgsEditorWidgetSetup("ExternalResource", config))
         # print("done")
+
+
+    """
+    *************************************************************************************************
+                                    PART-2
+    *************************************************************************************************
+    """
+
+    def collectData(self, layer, xFormKey, doImportData=False, topElement='', version=None, geoField=''):
+        #        if layer :
+        #            print("layer is not present or not valid")
+        #            return
+        def testc(exception, result):
+            if exception:
+                # print("task raised exception")
+                pass
+            else:
+                # print("Success", result[0])
+                # print("task returned")
+                pass
+
+        self.updateFields(layer)
+        self.layer = layer
+        self.turl = url_odk
+        self.auth = self.getAuth()
+        self.lastID = last_submission_odk
+        self.proxyConfig = self.getproxiesConf()
+        self.xFormKey = xFormKey
+        self.isImportData = doImportData
+        self.topElement = topElement
+        self.version = version
+        # print("task is being created")
+        # self.task1 = QgsTask.fromFunction('downloading data', self.getTable, on_finished=self.comp)
+        # print("task is created")
+        # print("task status1 is  ", self.task1.status())
+        # QgsApplication.taskManager().addTask(self.task1)
+        # print("task added to taskmanager")
+        # print("task status2 is  ", self.task1.status())
+        # # task1.waitForFinished()
+        # print("task status3 is  ", self.task1.status())
+        # response, remoteTable = self.getTable(xFormKey,importData,topElement,version)
+        print(self.getTable())
+        # self.comp(self.getTable())
+
+    def getTable(self):
+        """Retrieves data from form table, and filters out only the necessary fields
+        Returns
+        ------
+        response, list
+            response1 - HTTP response
+                response containing original form table data
+            table - list
+                contains filtered fields
+        """
+
+        user=username_odk
+        password=password_odk
+        requests.packages.urllib3.disable_warnings()
+        # hard coded url is being used
+        url=url_odk
+        # print(url)
+        storedGeoField = self.geoField
+        lastSub=""
+        if not self.isImportData:
+            try:
+                lastSub=last_submission_odk
+            except:
+                print("error")
+        url_submissions=url + "v1/projects/"+str(self.project_id)+"/forms/" + self.form_name
+        url_data=url + "v1/projects/"+str(self.project_id)+"/forms/" + self.form_name + ".svc/Submissions"
+        #print('urldata is '+url_data)
+        response = requests.get(url_submissions, headers={"Authorization": "Bearer " + self.usertoken, "X-Extended-Metadata": "true"})
+        response1 = requests.get(url_data, headers={"Authorization": "Bearer " + self.usertoken})
+        submissionHistory=response.json()
+        # json produces nested dictionary contain all table data
+        data=response1.json()
+        # print(data)
+        subTimeList=[]
+        table=[]
+        if submissionHistory['submissions']==0:
+            return response1, table
+        for submission in data['value']:
+            formattedData = self.flattenValues(submission)
+            formattedData[storedGeoField] = formattedData.pop('coordinates')
+            formattedData['ODKUUID'] = formattedData.pop('__id')
+            subTime = formattedData['submissionDate']
+            subTime_datetime=datetime.datetime.strptime(subTime[0: subTime.index('.')],'%Y-%m-%dT%H:%M:%S')
+            subTimeList.append(subTime_datetime)
+            stringversion = ''
+            coordinates = formattedData[storedGeoField]
+            # removes brackets to format coordinates in a string separated by spaces (ex. "38.548165 -98.318627 0")
+            if formattedData['type'] == 'Point':
+                latitude = coordinates[1]
+                coordinates[1] = coordinates[0]
+                coordinates[0] = latitude
+                for val in formattedData[storedGeoField]:
+                    stringversion+= str(val) + ' '
+            else:
+                count = 1
+                for each_coor in coordinates:
+                    temp = ""
+                    #converting current (longitude, latitude) coordinate to (latitude, longitude) for accurate graphing
+                    latitude = each_coor[1]
+                    each_coor[1] = each_coor[0]
+                    each_coor[0] = latitude
+                    for val in each_coor:
+                        temp += str(val) + " "
+                    stringversion += str("".join(temp.rstrip()))
+                    if count != len(coordinates):
+                        stringversion += ";"
+                    count+=1
+            formattedData[storedGeoField] = stringversion
+            if formattedData['attachmentsPresent']>0:
+                url_data1 = url + "v1/projects/"+str(self.project_id)+"/forms/" + self.form_name +"/submissions"+"/"+formattedData['ODKUUID']+ "/attachments"
+                media_links_url = url + "#/dl/projects/"+str(self.project_id)+"/forms/" + self.form_name +"/submissions"+"/"+formattedData['ODKUUID']+ "/attachments"
+                # print("making attachment request"+url_data1)
+                attachmentsResponse = requests.get(url_data1, headers={"Authorization": "Bearer " + self.usertoken})
+                # print("url response is"+ str(attachmentsResponse.status_code))
+                for attachment in attachmentsResponse.json():
+                    binar_url= media_links_url +"/"+str(attachment['name'])
+            #subTime_datetime=datetime.datetime.strptime(subTime,'%Y-%m-%dT%H:%M:%S')
+            #subTimeList.append(subTime_datetime)
+            for key in list(formattedData):
+                # print(key)
+                if key == self.geoField:
+                    # print (self.geoField)
+                    continue
+                if key not in self.fields:
+                    formattedData.pop(key)
+                else:
+                    if self.fields[key]=="binary":
+                        formattedData[key]=binar_url
+            # print("submission parsed"+str(formattedData))
+            table.append(formattedData)
+        if len(subTimeList)>0:
+            lastSubmission=max(subTimeList)
+            lastSubmission=datetime.datetime.strftime(lastSubmission,'%Y-%m-%dT%H:%M:%S')+"+0000"
+            # self.getValue(self.tr('last Submission'),lastSubmission)
+        return {'response':response1, 'table':table,'lastID':lastSubmission}
 
 """
 *************************************************************************************************
