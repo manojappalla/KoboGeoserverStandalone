@@ -149,6 +149,6 @@ class ImportOdk():
 data_kobo = ImportOdk()
 
 try:
-    data_kobo.getFormList()
+    print(data_kobo.getFormList())
 except:
     print("Invalid credentials entered")
