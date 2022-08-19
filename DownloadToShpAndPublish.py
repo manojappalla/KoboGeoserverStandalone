@@ -27,11 +27,16 @@ config.read('GeoserverAuth.ini')
 url_geoserver = config['Geoserver Credentials']['Url']
 username_geoserver = config['Geoserver Credentials']['Username']
 password_geoserver = config['Geoserver Credentials']['password']
-shp_workspace_name = config['Shapefile Workspace Store']['workspace_name']
-shp_store_name = config['Shapefile Workspace Store']['store_name']
-shp_path = config['Shapefile Workspace Store']['shp_path']
-no_of_times_published = int(config['Shapefile Workspace Store']['publish_count'])
-layer_name = shp_path.split('/')[-1].split('.')[0]
+
+# KOBO-GEOSERVER VARIABLES
+shp_workspace_name_kobo = config['Shapefile Workspace Store']['workspace_name_kobo']
+shp_store_name_kobo = config['Shapefile Workspace Store']['store_name_kobo']
+shp_path_kobo = config['Shapefile Workspace Store']['shp_path_kobo']
+no_of_times_published_kobo = int(config['Shapefile Workspace Store']['publish_count_kobo'])
+# layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
+
+# ODK-GEOSERVER VARIABLES
+
 
 
 # INITIALIZE STANDALONE APPLICATION
@@ -60,7 +65,7 @@ def qtype(odktype):
 
 
 # CREATE THE IMPORT CLASS
-class Import:
+class ImportKobo:
 
     def __init__(self, kobo_url, kobo_username, kobo_password):
         self.kobo_url = kobo_url
@@ -498,10 +503,10 @@ class Import:
                 layer.addFeatures(newQgisFeatures)
 
             # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
-            if (form_feature_count >= 2 and no_of_times_published == 0):
-                layer_name = shp_path.split('/')[-1].split('.')[0]
-                geo.create_datastore(name=shp_store_name, path=shp_path, workspace=shp_workspace_name)
-                geo.publish_featurestore(workspace=shp_workspace_name, store_name=shp_store_name, pg_table=layer_name)
+            if (form_feature_count >= 2 and no_of_times_published_kobo == 0):
+                layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
+                geo.create_datastore(name=shp_store_name_kobo, path=shp_path_kobo, workspace=shp_workspace_name_kobo)
+                geo.publish_featurestore(workspace=shp_workspace_name_kobo, store_name=shp_store_name_kobo, pg_table=layer_name)
             config['Shapefile Workspace Store']['publish_count'] = str(1)
             with open('GeoserverAuth.ini', 'w') as configfile:
                 config.write(configfile)
@@ -573,44 +578,12 @@ class Import:
 
 
 
-
-
-
-
 """
 *************************************************************************************************
-                            SETTING UP THE URL, USERNAME, AND PASSWORD
+                               KOBO ---> TESTING getFormList
 *************************************************************************************************
 """
-# user_choice = input("Please enter 'y' if you want to change your kobo credentials or 'n' if you don't want to change: ")
-#
-# url = None
-# username = None
-# password = None
-#
-# if user_choice == 'y':
-#     url = input("Please enter url: ")
-#     username = input("Please enter username: ")
-#     password = input("Please enter password: ")
-#
-#     kobo['Kobo Credentials']['url'] = url
-#     kobo['Kobo Credentials']['username'] = username
-#     kobo['Kobo Credentials']['password'] = password
-#     with open('KoboAuth.ini', 'w') as configfile:
-#         kobo.write(configfile)
-#
-# elif user_choice == 'n':
-
-# url = kobo['Kobo Credentials']['url']
-# username = kobo['Kobo Credentials']['username']
-# password = kobo['Kobo Credentials']['password']
-
-"""
-*************************************************************************************************
-                                TESTING getFormList
-*************************************************************************************************
-"""
-data = Import(url_kobo, username_kobo, password_kobo)
+data = ImportKobo(url_kobo, username_kobo, password_kobo)
 
 try:
     data.getFormList()
@@ -620,29 +593,16 @@ except:
 
 """
 *************************************************************************************************
-                                TESTING importData, updateLayerXML, updateFields
+                               KOBO ---> TESTING importData, updateLayerXML, updateFields
 *************************************************************************************************
 """
 
 # TODO: Create one empty shapefile and pass it as an argument to the importData function
 
-layer = QgsVectorLayer(shp_path, "new", "ogr")
+layer = QgsVectorLayer(shp_path_kobo, "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
 selected_form = kobo['Forms List']['last used']
 data.importData(layer, selected_form)
 
 
-"""
-*************************************************************************************************
-                                INGESTION OF DATA INTO GEOSERVER
-*************************************************************************************************
-"""
-
-# url = input("Enter url: ")
-# username = input("Enter username: ")
-# password = input("Enter password: ")
-# workspace_name = input("Enter workspace name: ")
-#
-# auth = Auth(url, username, password, workspace_name)
-# auth.createWorkspace()
 
