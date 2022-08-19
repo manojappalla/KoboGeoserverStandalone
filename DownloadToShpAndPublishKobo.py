@@ -32,26 +32,12 @@ password_kobo = kobo['Kobo Credentials']['password']
 last_submission_kobo = kobo['Kobo Credentials']['last submission']
 form_feature_count_kobo = 0
 
-# ODK VARIABLES
-odk = configparser.ConfigParser()
-odk.read('OdkAuth.ini')
-
-url_odk = odk['Odk Credentials']['url']
-username_odk = odk['Odk Credentials']['username']
-password_odk = odk['Odk Credentials']['password']
-last_submission_odk = odk['Odk Credentials']['last submission']
-form_feature_count_odk = 0
-
 # KOBO-GEOSERVER VARIABLES
 shp_workspace_name_kobo = config['Shapefile Workspace Store']['workspace_name_kobo']
 shp_store_name_kobo = config['Shapefile Workspace Store']['store_name_kobo']
 shp_path_kobo = config['Shapefile Workspace Store']['shp_path_kobo']
 no_of_times_published_kobo = int(config['Shapefile Workspace Store']['publish_count_kobo'])
 # layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
-
-# ODK-GEOSERVER VARIABLES
-
-
 
 """
 ************************************************************************************************************************
@@ -525,7 +511,7 @@ class ImportKobo:
                 layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
                 geo.create_datastore(name=shp_store_name_kobo, path=shp_path_kobo, workspace=shp_workspace_name_kobo)
                 geo.publish_featurestore(workspace=shp_workspace_name_kobo, store_name=shp_store_name_kobo, pg_table=layer_name)
-            config['Shapefile Workspace Store']['publish_count'] = str(1)
+            config['Shapefile Workspace Store']['publish_count_kobo'] = str(1)
             with open('GeoserverAuth.ini', 'w') as configfile:
                 config.write(configfile)
         except:
@@ -593,8 +579,6 @@ class ImportKobo:
             return QgsPoint(xform.transform(pPoint))
         except :
             return QgsPoint(xform.transform(QgsPointXY(pPoint)))
-
-
 
 """
 *************************************************************************************************
