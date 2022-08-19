@@ -15,6 +15,8 @@ from Geoserver import Geoserver
 """
 ********************************* SETUPT ALL THE VARIABLES - START *****************************************************
 """
+form_feature_count_odk = 0
+
 # GEOSERVER VARIABLES
 config = configparser.ConfigParser()
 config.read('GeoserverAuth.ini')
@@ -456,7 +458,170 @@ class ImportOdk():
             lastSubmission=max(subTimeList)
             lastSubmission=datetime.datetime.strftime(lastSubmission,'%Y-%m-%dT%H:%M:%S')+"+0000"
             # self.getValue(self.tr('last Submission'),lastSubmission)
+        global form_feature_count_odk
+        form_feature_count_odk = len(table) # No of submissions in the form
         return {'response':response1, 'table':table,'lastID':lastSubmission}
+
+
+    def comp(self,result):
+        # if exception:
+        #     print("exception in task execution")
+        response=result['response']
+        remoteTable=result['table']
+        # print(remoteTable)
+        lastID=result['lastID']
+        if response.status_code == 200:
+            # print ('after task finished before update layer')
+            if remoteTable:
+                # print ('task has returned some data')
+                self.updateLayer(self.layer,remoteTable,self.geoField)
+                # print("lastID is",lastID)
+                odk['Odk Credentials']['last submission'] = str(lastID)
+                with open('KoboAuth.ini', 'w') as configfile:
+                    odk.write(configfile)
+                # print(kobo['Kobo Credentials']['last submission'])
+                print("Data imported Successfully")
+        else:
+            print("Not able to collect data.")
+
+
+    def updateLayer(self, layer, dataDict, geoField=''):
+        # print "UPDATING N.",len(dataDict),'FEATURES'
+        self.processingLayer = layer
+        QgisFieldsList = [field.name() for field in layer.fields()]
+        # layer.beginEditCommand("ODK syncronize")
+        #        layer.startEditing()
+        type = layer.geometryType()
+        geo = ['POINT', 'LINE', 'POLYGON']
+        layerGeo = geo[type]
+
+        uuidList = self.getUUIDList(self.processingLayer)
+
+        newQgisFeatures = []
+        fieldError = None
+        # print('geofield is', geoField)
+        for odkFeature in dataDict:
+            # print(odkFeature)
+            id = None
+            try:
+                id = odkFeature['ODKUUID']
+                # print('odk id is', id)
+            except:
+                # print('error in reading ODKUUID')
+                pass
+            try:
+                if not id in uuidList:
+                    qgisFeature = QgsFeature()
+                    # print("odkFeature", odkFeature)
+                    wktGeom = self.guessWKTGeomType(odkFeature[geoField])
+                    # print(wktGeom)
+                    if wktGeom[:3] != layerGeo[:3]:
+                        # print(wktGeom, 'is not matching' + layerGeo)
+                        continue
+                    qgisGeom = QgsGeometry.fromWkt(wktGeom)
+                    # print('geom is', qgisGeom)
+                    qgisFeature.setGeometry(qgisGeom)
+                    qgisFeature.initAttributes(len(QgisFieldsList))
+                    for fieldName, fieldValue in odkFeature.items():
+                        if fieldName != geoField:
+                            try:
+                                qgisFeature.setAttribute(QgisFieldsList.index(fieldName[:10]), fieldValue)
+                            except:
+                                fieldError = fieldName
+
+                    newQgisFeatures.append(qgisFeature)
+
+            except Exception as e:
+                # print('unable to create', e)
+                pass
+            # print(dataDict)
+        try:
+            geo = Geoserver(url_geoserver, username_geoserver, password_geoserver)
+            with edit(layer):
+                layer.addFeatures(newQgisFeatures)
+
+            # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
+            if (form_feature_count_odk >= 2 and no_of_times_published_odk == 0):
+                layer_name = shp_path_odk.split('/')[-1].split('.')[0]
+                geo.create_datastore(name=shp_store_name_odk, path=shp_path_odk, workspace=shp_workspace_name_odk)
+                geo.publish_featurestore(workspace=shp_workspace_name_odk, store_name=shp_store_name_odk, pg_table=layer_name)
+            config['Shapefile Workspace Store']['publish_count_kobo'] = str(1)
+            with open('GeoserverAuth.ini', 'w') as configfile:
+                config.write(configfile)
+        except:
+            # print("Stop layer editing and import again")
+            pass
+        self.processingLayer = None
+
+
+
+    def getUUIDList(self,lyr):
+        uuidList = []
+        uuidFieldName=None
+        QgisFieldsList = [field.name() for field in lyr.fields()]
+        for field in QgisFieldsList:
+            if 'UUID' in field:
+                uuidFieldName =field
+        if uuidFieldName:
+            # print(uuidFieldName)
+            for qgisFeature in lyr.getFeatures():
+                uuidList.append(qgisFeature[uuidFieldName])
+        # print (uuidList)
+        return uuidList
+
+
+    def guessWKTGeomType(self, geom):
+        if geom:
+            coordinates = geom.split(';')
+        else:
+            return 'error'
+        #        print ('coordinates are '+ coordinates)
+        firstCoordinate = coordinates[0].strip().split(" ")
+        if len(firstCoordinate) < 2:
+            return "invalid", None
+        coordinatesList = []
+        for coordinate in coordinates:
+            decodeCoord = coordinate.strip().split(" ")
+            #            print 'decordedCoord is'+ decodeCoord
+            try:
+                coordinatesList.append([decodeCoord[0], decodeCoord[1]])
+            except:
+                pass
+        if len(coordinates) == 1:
+
+            reprojectedPoint = self.transformToLayerSRS(
+                QgsPoint(float(coordinatesList[0][1]), float(coordinatesList[0][0])))
+            return "POINT(%s %s)" % (reprojectedPoint.x(), reprojectedPoint.y())  # geopoint
+        else:
+            coordinateString = ""
+            for coordinate in coordinatesList:
+                reprojectedPoint = self.transformToLayerSRS(QgsPoint(float(coordinate[1]), float(coordinate[0])))
+                coordinateString += "%s %s," % (reprojectedPoint.x(), reprojectedPoint.y())
+            coordinateString = coordinateString[:-1]
+        if coordinatesList[0][0] == coordinatesList[-1][0] and coordinatesList[0][1] == coordinatesList[-1][1]:
+            return "POLYGON((%s))" % coordinateString  # geoshape #geotrace
+        else:
+            return "LINESTRING(%s)" % coordinateString
+
+
+    def transformToLayerSRS(self, pPoint):
+        # transformation from the current SRS to WGS84
+        crsDest = self.processingLayer.crs () # get layer crs
+        crsSrc = QgsCoordinateReferenceSystem("EPSG:4326")  # WGS 84
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
+        try:
+            return QgsPoint(xform.transform(pPoint))
+        except :
+            return QgsPoint(xform.transform(QgsPointXY(pPoint)))
+
+
+
+
+
+
+
+
+
 
 """
 *************************************************************************************************
