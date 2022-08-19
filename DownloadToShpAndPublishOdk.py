@@ -119,6 +119,28 @@ class ImportOdk():
             print("Invalid url, username, project name or password")
             return None, None
 
+    def flattenValues(self, nestedDict):
+        """Reformats a nested dictionary into a flattened dictionary
+        If the argument parent_key and sep aren't passed in, the default underscore is used
+        Parameters
+        ----------
+        d: nested dictionary
+            ex. {'geotrace_example': {'type': 'LineString', 'coordinates': [[-98.318627, 38.548165, 0]}}
+        Returns
+        ------
+        dict(items) - dictionary
+            ex. {'type': 'LineString', 'coordinates': [[-98.318627, 38.548165, 0]}
+        """
+
+        new_dict = {}
+        for rkey,val in nestedDict.items():
+            key = rkey
+            if isinstance(val, dict):
+                new_dict.update(self.flattenValues(val))
+            else:
+                new_dict[key] = val
+        return new_dict
+
 """
 *************************************************************************************************
                                KOBO ---> TESTING getFormList
@@ -127,6 +149,6 @@ class ImportOdk():
 data_kobo = ImportOdk()
 
 try:
-    print(data_kobo.getFormList())
+    data_kobo.getFormList()
 except:
     print("Invalid credentials entered")
