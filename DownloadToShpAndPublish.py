@@ -10,6 +10,18 @@ from PyQt5.QtCore import *
 from Auth import Auth
 from Geoserver import Geoserver
 
+
+"""
+********************************* SETUPT ALL THE VARIABLES - START *****************************************************
+"""
+# GEOSERVER VARIABLES
+config = configparser.ConfigParser()
+config.read('GeoserverAuth.ini')
+
+url_geoserver = config['Geoserver Credentials']['Url']
+username_geoserver = config['Geoserver Credentials']['Username']
+password_geoserver = config['Geoserver Credentials']['password']
+
 # KOBO VARIABLES
 kobo = configparser.ConfigParser()
 kobo.read('KoboAuth.ini')
@@ -18,15 +30,17 @@ url_kobo = kobo['Kobo Credentials']['url']
 username_kobo = kobo['Kobo Credentials']['username']
 password_kobo = kobo['Kobo Credentials']['password']
 last_submission_kobo = kobo['Kobo Credentials']['last submission']
-form_feature_count = 0
+form_feature_count_kobo = 0
 
-# GEOSERVER VARIABLES
-config = configparser.ConfigParser()
-config.read('GeoserverAuth.ini')
+# ODK VARIABLES
+odk = configparser.ConfigParser()
+odk.read('OdkAuth.ini')
 
-url_geoserver = config['Geoserver Credentials']['Url']
-username_geoserver = config['Geoserver Credentials']['Username']
-password_geoserver = config['Geoserver Credentials']['password']
+url_odk = odk['Odk Credentials']['url']
+username_odk = odk['Odk Credentials']['username']
+password_odk = odk['Odk Credentials']['password']
+last_submission_odk = odk['Odk Credentials']['last submission']
+form_feature_count_odk = 0
 
 # KOBO-GEOSERVER VARIABLES
 shp_workspace_name_kobo = config['Shapefile Workspace Store']['workspace_name_kobo']
@@ -38,6 +52,10 @@ no_of_times_published_kobo = int(config['Shapefile Workspace Store']['publish_co
 # ODK-GEOSERVER VARIABLES
 
 
+
+"""
+************************************************************************************************************************
+"""
 
 # INITIALIZE STANDALONE APPLICATION
 QgsApplication.setPrefixPath("/Applications/QGIS-LTR.app/Contents/Resources", True)
@@ -392,8 +410,8 @@ class ImportKobo:
             #print(data,type(data))
             subList=[]
             # print("no of submissions are",data['count'])
-            global form_feature_count
-            form_feature_count = data['count']
+            global form_feature_count_kobo
+            form_feature_count_kobo = data['count']
             if data['count']==0:
                 return {'response':response, 'table':table}
             for submission in data['results']:
@@ -503,7 +521,7 @@ class ImportKobo:
                 layer.addFeatures(newQgisFeatures)
 
             # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
-            if (form_feature_count >= 2 and no_of_times_published_kobo == 0):
+            if (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 0):
                 layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
                 geo.create_datastore(name=shp_store_name_kobo, path=shp_path_kobo, workspace=shp_workspace_name_kobo)
                 geo.publish_featurestore(workspace=shp_workspace_name_kobo, store_name=shp_store_name_kobo, pg_table=layer_name)
@@ -583,10 +601,10 @@ class ImportKobo:
                                KOBO ---> TESTING getFormList
 *************************************************************************************************
 """
-data = ImportKobo(url_kobo, username_kobo, password_kobo)
+data_kobo = ImportKobo(url_kobo, username_kobo, password_kobo)
 
 try:
-    data.getFormList()
+    data_kobo.getFormList()
 except:
     print("Invalid credentials entered")
 
@@ -602,7 +620,7 @@ except:
 layer = QgsVectorLayer(shp_path_kobo, "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
 selected_form = kobo['Forms List']['last used']
-data.importData(layer, selected_form)
+data_kobo.importData(layer, selected_form)
 
 
 
