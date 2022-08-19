@@ -477,7 +477,7 @@ class ImportOdk():
                 self.updateLayer(self.layer,remoteTable,self.geoField)
                 # print("lastID is",lastID)
                 odk['Odk Credentials']['last submission'] = str(lastID)
-                with open('KoboAuth.ini', 'w') as configfile:
+                with open('OdkAuth.ini', 'w') as configfile:
                     odk.write(configfile)
                 # print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
