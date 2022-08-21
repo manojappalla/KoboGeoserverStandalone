@@ -15,7 +15,7 @@ from Geoserver import Geoserver
 """
 ********************************* SETUPT ALL THE VARIABLES - START *****************************************************
 """
-form_feature_count_odk = 0
+# form_feature_count_odk = 0
 
 # GEOSERVER VARIABLES
 config = configparser.ConfigParser()
