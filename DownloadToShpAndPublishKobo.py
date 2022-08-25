@@ -605,12 +605,12 @@ except:
 layer = QgsVectorLayer(shp_path_kobo, "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
 selected_form = kobo['Forms List']['last used']
-
-try:
-    while True:
-        data_kobo.importData(layer, selected_form)
-except KeyboardInterrupt:
-    pass
+data_kobo.importData(layer, selected_form)
+# try:
+#     while True:
+#         data_kobo.importData(layer, selected_form)
+# except KeyboardInterrupt:
+#     pass
 
 
 
