@@ -630,10 +630,10 @@ class ImportOdk():
                                KOBO ---> TESTING getFormList
 *************************************************************************************************
 """
-data_kobo = ImportOdk()
+data_odk = ImportOdk()
 
 try:
-    data_kobo.getFormList()
+    data_odk.getFormList()
     # pass
 except:
     print("Invalid credentials entered")
@@ -647,7 +647,7 @@ layer = QgsVectorLayer(shp_path_odk, "new", "ogr")
 
 try:
     while True:
-        data_kobo.importData(layer, last_selected_form_id)
+        data_odk.importData(layer, last_selected_form_id)
 except KeyboardInterrupt:
     pass
 
