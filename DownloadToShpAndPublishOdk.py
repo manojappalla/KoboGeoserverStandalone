@@ -1,3 +1,5 @@
+#!/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3.8
+
 # IMPORT ALL THE NECESSARY LIBRARIES
 import os
 import datetime
@@ -208,7 +210,7 @@ class ImportOdk():
             return
         if response.status_code == 200:
             xml = response.content
-            print(xml)
+            # print(xml)
             self.layer_name, self.version, self.geoField, self.fields = self.updateLayerXML(layer, xml)
             # layer.setName(self.layer_name)
             self.collectData(layer, selectedForm, doImportData, self.layer_name, self.version, self.geoField)
@@ -361,7 +363,7 @@ class ImportOdk():
         # # task1.waitForFinished()
         # print("task status3 is  ", self.task1.status())
         # response, remoteTable = self.getTable(xFormKey,importData,topElement,version)
-        print(self.getTable())
+        # print(self.getTable())
         self.comp(self.getTable())
 
     def getTable(self):
@@ -631,7 +633,8 @@ class ImportOdk():
 data_kobo = ImportOdk()
 
 try:
-    print(data_kobo.getFormList())
+    data_kobo.getFormList()
+    # pass
 except:
     print("Invalid credentials entered")
 
@@ -641,4 +644,10 @@ except:
 *************************************************************************************************
 """
 layer = QgsVectorLayer(shp_path_odk, "new", "ogr")
-data_kobo.importData(layer, last_selected_form_id)
+
+try:
+    while True:
+        data_kobo.importData(layer, last_selected_form_id)
+except KeyboardInterrupt:
+    pass
+

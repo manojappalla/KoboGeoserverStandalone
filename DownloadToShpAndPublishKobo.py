@@ -1,3 +1,4 @@
+#!/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3.8
 # IMPORT ALL THE NECESSARY LIBRARIES
 import os
 import requests
@@ -604,7 +605,13 @@ except:
 layer = QgsVectorLayer(shp_path_kobo, "new", "ogr")
 # QgsProject.instance().addMapLayer(layer)
 selected_form = kobo['Forms List']['last used']
-data_kobo.importData(layer, selected_form)
+
+try:
+    while True:
+        data_kobo.importData(layer, selected_form)
+except KeyboardInterrupt:
+    pass
+
 
 
 
