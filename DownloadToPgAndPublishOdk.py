@@ -56,7 +56,6 @@ QgsApplication.setPrefixPath("/Applications/QGIS-LTR.app/Contents/Resources", Tr
 qgs = QgsApplication([], False)
 qgs.initQgis()
 
-
 # START WRITING THE FUNCTIONS
 def qtype(odktype):
     if odktype == 'binary':
@@ -267,7 +266,7 @@ class ImportOdk():
                 #print('creating new field:'+ fieldName)
                 isHidden= True
                 if fieldName=='instanceID':
-                    fieldName='odkuuid'
+                    fieldName='ODKUUID'
                     fields[fieldName]=fieldType
                     isHidden= False
                 for input in inputs:
@@ -284,7 +283,7 @@ class ImportOdk():
             self.updateFields(layer,fieldName,qgstype,config)
         return layer_name,version,geoField,fields
 
-    def updateFields(self, layer, text='odkuuid', q_type=QVariant.String, config={}):
+    def updateFields(self, layer, text='ODKUUID', q_type=QVariant.String, config={}):
 
         """
 
@@ -507,7 +506,7 @@ class ImportOdk():
             id = None
             try:
                 id = odkFeature['ODKUUID']
-                print('odk id is', id)
+                # print('odk id is', id)
             except:
                 # print('error in reading ODKUUID')
                 pass
@@ -651,8 +650,6 @@ class ImportOdk():
 
 
 
-
-
 """
 *************************************************************************************************
                                KOBO ---> TESTING getFormList
@@ -680,6 +677,10 @@ uri.setDataSource("public", "test_pg_odk", "geom")
 
 vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_odk", "postgres")
 
+if vlayer.isValid():
+    print("Layer is valid")
+else:
+    print("layer is not valid")
 try:
     while True:
         data_odk.importData(vlayer, last_selected_form_id)
