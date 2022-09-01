@@ -253,6 +253,8 @@ class ImportOdk():
         for bind in root[0][1].findall(ns+'bind'):
             attrib=bind.attrib
             fieldName= attrib['nodeset'].split('/')[-1]
+            # if fieldName == 'ODKUUID':
+            #     fieldName = fieldName.lower()
             try:
                 fieldType=attrib['type']
             except:
@@ -263,8 +265,8 @@ class ImportOdk():
 #            print ('first attribute'+ fieldName)
             inputs=root[1].findall('.//*[@ref]')
             if fieldType[:3]!='geo':
-                #print('creating new field:'+ fieldName)
-                isHidden= True
+                print('creating new field:'+ fieldName)
+                isHidden= False #CHANGED
                 if fieldName=='instanceID':
                     fieldName='ODKUUID'
                     fields[fieldName]=fieldType
@@ -280,6 +282,7 @@ class ImportOdk():
                 geoField=fieldName
                 # print('geometry field is =',fieldName)
                 continue
+            print(layer, fieldName, qgstype, config)
             self.updateFields(layer,fieldName,qgstype,config)
         return layer_name,version,geoField,fields
 
@@ -303,6 +306,7 @@ class ImportOdk():
                 # print("not writing fields")
         if flag:
             uuidField = QgsField(text, q_type)
+            # print(uuidField)
             if q_type == QVariant.String:
                 uuidField.setLength(300)
             layer.dataProvider().addAttributes([uuidField])
@@ -450,6 +454,9 @@ class ImportOdk():
                     continue
                 if key not in self.fields:
                     formattedData.pop(key)
+                # if key == 'ODKUUID':
+                #     formattedData['odkuuid'] = formattedData['ODKUUID']
+                #     del formattedData['ODKUUID']
                 else:
                     if self.fields[key]=="binary":
                         formattedData[key]=binar_url
@@ -681,9 +688,10 @@ if vlayer.isValid():
     print("Layer is valid")
 else:
     print("layer is not valid")
-try:
-    while True:
-        data_odk.importData(vlayer, last_selected_form_id)
-except KeyboardInterrupt:
-    pass
+data_odk.importData(vlayer, last_selected_form_id)
+# try:
+#     while True:
+#         data_odk.importData(vlayer, last_selected_form_id)
+# except KeyboardInterrupt:
+#     pass
 
