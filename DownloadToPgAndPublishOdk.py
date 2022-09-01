@@ -452,11 +452,13 @@ class ImportOdk():
                 if key == self.geoField:
                     # print (self.geoField)
                     continue
+                if key in self.fields and key == 'ODKUUID':
+                    print("{} is ODKUUID".format(key))
+                    formattedData['odkuuid'] = formattedData['ODKUUID']
+                    del formattedData['ODKUUID']
                 if key not in self.fields:
                     formattedData.pop(key)
-                # if key == 'ODKUUID':
-                #     formattedData['odkuuid'] = formattedData['ODKUUID']
-                #     del formattedData['ODKUUID']
+
                 else:
                     if self.fields[key]=="binary":
                         formattedData[key]=binar_url
@@ -512,7 +514,7 @@ class ImportOdk():
             # print(odkFeature)
             id = None
             try:
-                id = odkFeature['ODKUUID']
+                id = odkFeature['odkuuid']
                 # print('odk id is', id)
             except:
                 # print('error in reading ODKUUID')
@@ -599,7 +601,7 @@ class ImportOdk():
         uuidFieldName=None
         QgisFieldsList = [field.name() for field in lyr.fields()]
         for field in QgisFieldsList:
-            if 'UUID' in field:
+            if 'uuid' in field:
                 uuidFieldName =field
         if uuidFieldName:
             # print(uuidFieldName)
