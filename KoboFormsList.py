@@ -69,14 +69,14 @@ def getFormList():
         return None, None
 
 list_of_forms = list(getFormList().items())
-key_list = list(kobo['Forms List'].keys())
+# key_list = list(kobo['Forms List'].keys())
 # print(key_list)
 
 for list in list_of_forms:
-    print(list[0])
-    for key in key_list:
-        if key != list[0] and key != 'last used':
-            del kobo['Forms List'][key]
+    # print(list[0])
+    # for key in key_list:
+    #     if key != list[0] and key != 'last used':
+    #         del kobo['Forms List'][key]
     kobo['Forms List'][list[0]] = list[1]
     kobo['Forms List']['last used'] = ""
     with open('ini/KoboAuth.ini', 'w') as configfile:
