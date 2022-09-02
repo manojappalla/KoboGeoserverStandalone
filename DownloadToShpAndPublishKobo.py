@@ -17,7 +17,7 @@ from Geoserver import Geoserver
 """
 # GEOSERVER VARIABLES
 config = configparser.ConfigParser()
-config.read('GeoserverAuth.ini')
+config.read('ini/GeoserverAuth.ini')
 
 url_geoserver = config['Geoserver Credentials']['Url']
 username_geoserver = config['Geoserver Credentials']['Username']
@@ -25,7 +25,7 @@ password_geoserver = config['Geoserver Credentials']['password']
 
 # KOBO VARIABLES
 kobo = configparser.ConfigParser()
-kobo.read('KoboAuth.ini')
+kobo.read('ini/KoboAuth.ini')
 
 url_kobo = kobo['Kobo Credentials']['url']
 username_kobo = kobo['Kobo Credentials']['username']
@@ -444,7 +444,7 @@ class ImportKobo:
                 self.updateLayer(self.layer,remoteTable,self.geoField)
                 # print("lastID is",lastID)
                 kobo['Kobo Credentials']['last submission'] = str(lastID)
-                with open('KoboAuth.ini', 'w') as configfile:
+                with open('ini/KoboAuth.ini', 'w') as configfile:
                     kobo.write(configfile)
                 # print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
@@ -544,7 +544,7 @@ class ImportKobo:
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
 
             config['Shapefile Workspace Store']['publish_count_kobo'] = str(1)
-            with open('GeoserverAuth.ini', 'w') as configfile:
+            with open('ini/GeoserverAuth.ini', 'w') as configfile:
                 config.write(configfile)
         except:
             # print("Stop layer editing and import again")

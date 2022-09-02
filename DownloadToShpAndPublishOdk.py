@@ -21,7 +21,7 @@ from Geoserver import Geoserver
 
 # GEOSERVER VARIABLES
 config = configparser.ConfigParser()
-config.read('GeoserverAuth.ini')
+config.read('ini/GeoserverAuth.ini')
 
 url_geoserver = config['Geoserver Credentials']['Url']
 username_geoserver = config['Geoserver Credentials']['Username']
@@ -29,7 +29,7 @@ password_geoserver = config['Geoserver Credentials']['password']
 
 # ODK VARIABLES
 odk = configparser.ConfigParser()
-odk.read('OdkAuth.ini')
+odk.read('ini/OdkAuth.ini')
 
 url_odk = odk['Odk Credentials']['url']
 username_odk = odk['Odk Credentials']['username']
@@ -479,7 +479,7 @@ class ImportOdk():
                 self.updateLayer(self.layer,remoteTable,self.geoField)
                 # print("lastID is",lastID)
                 odk['Odk Credentials']['last submission'] = str(lastID)
-                with open('OdkAuth.ini', 'w') as configfile:
+                with open('ini/OdkAuth.ini', 'w') as configfile:
                     odk.write(configfile)
                 # print(kobo['Kobo Credentials']['last submission'])
                 print("Data imported Successfully")
@@ -579,7 +579,7 @@ class ImportOdk():
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
 
             config['Shapefile Workspace Store']['publish_count_odk'] = str(1)
-            with open('GeoserverAuth.ini', 'w') as configfile:
+            with open('ini/GeoserverAuth.ini', 'w') as configfile:
                 config.write(configfile)
         except:
             # print("Stop layer editing and import again")
