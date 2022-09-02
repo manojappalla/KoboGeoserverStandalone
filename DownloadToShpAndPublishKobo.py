@@ -533,9 +533,9 @@ class ImportKobo:
                     x.find('maxx').text = str(qmaxx)
                     x.find('maxy').text = str(qmaxy)
 
-                tree.write('extent_kobo.xml')
+                tree.write('xml/shp_extent_kobo.xml')
 
-                tree = ET.parse('extent_kobo.xml')
+                tree = ET.parse('xml/shp_extent_kobo.xml')
                 tree = tree.getroot()
                 t = ET.tostring(tree)
                 headers = {'Content-Type': 'application/xml'}

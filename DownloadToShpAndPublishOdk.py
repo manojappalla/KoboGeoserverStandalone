@@ -568,9 +568,9 @@ class ImportOdk():
                     x.find('maxx').text = str(qmaxx)
                     x.find('maxy').text = str(qmaxy)
 
-                tree.write('extent_odk.xml')
+                tree.write('xml/shp_extent_odk.xml')
 
-                tree = ET.parse('extent_odk.xml')
+                tree = ET.parse('xml/shp_extent_odk.xml')
                 tree = tree.getroot()
                 t = ET.tostring(tree)
                 headers = {'Content-Type': 'application/xml'}
@@ -675,10 +675,10 @@ except:
 *************************************************************************************************
 """
 layer = QgsVectorLayer(shp_path_odk, "new", "ogr")
-
-try:
-    while True:
-        data_odk.importData(layer, last_selected_form_id)
-except KeyboardInterrupt:
-    pass
+data_odk.importData(layer, last_selected_form_id)
+# try:
+#     while True:
+#         data_odk.importData(layer, last_selected_form_id)
+# except KeyboardInterrupt:
+#     pass
 
