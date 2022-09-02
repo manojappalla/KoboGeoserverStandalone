@@ -4,7 +4,7 @@ import requests
 from PyQt5.QtCore import QSettings
 
 kobo = configparser.ConfigParser()
-kobo.read('KoboAuth.ini')
+kobo.read('ini/KoboAuth.ini')
 
 url_kobo = kobo['Kobo Credentials']['url']
 username_kobo = kobo['Kobo Credentials']['username']
@@ -73,6 +73,7 @@ list_of_forms = list(getFormList().items())
 for list in list_of_forms:
     # print(list)
     kobo['Forms List'][list[0]] = list[1]
-    with open('KoboAuth.ini', 'w') as configfile:
+    kobo['Forms List']['last used'] = ""
+    with open('ini/KoboAuth.ini', 'w') as configfile:
         kobo.write(configfile)
 

@@ -4,7 +4,7 @@ from PyQt5.QtCore import QSettings
 
 # ODK VARIABLES
 odk = configparser.ConfigParser()
-odk.read('OdkAuth.ini')
+odk.read('ini/OdkAuth.ini')
 
 url_odk = odk['Odk Credentials']['url']
 username_odk = odk['Odk Credentials']['username']
@@ -51,10 +51,11 @@ def getFormList():
 
 list_of_forms = list(getFormList().items())
 odk[last_project_used_odk] = {}
-with open('OdkAuth.ini', 'w') as configfile:
+with open('ini/OdkAuth.ini', 'w') as configfile:
     odk.write(configfile)
 for list in list_of_forms:
     # print(list)
+    odk[last_project_used_odk]['last selected form'] = ""
     odk[last_project_used_odk][list[0]] = list[1]
-    with open('OdkAuth.ini', 'w') as configfile:
+    with open('ini/OdkAuth.ini', 'w') as configfile:
         odk.write(configfile)
