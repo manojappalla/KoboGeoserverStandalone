@@ -547,6 +547,9 @@ class ImportOdk():
                 layer_name = shp_path_odk.split('/')[-1].split('.')[0]
                 geo.create_datastore(name=shp_store_name_odk, path=shp_path_odk, workspace=shp_workspace_name_odk)
                 geo.publish_featurestore(workspace=shp_workspace_name_odk, store_name=shp_store_name_odk, pg_table=layer_name)
+                config['Shapefile Workspace Store']['publish_count_odk'] = str(1)
+                with open('ini/GeoserverAuth.ini', 'w') as configfile:
+                    config.write(configfile)
 
             # CODE FOR UPDATING EXTENTS
             elif (form_feature_count_odk >= 2 and no_of_times_published_odk == 1):
@@ -578,9 +581,7 @@ class ImportOdk():
                     'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_odk, shp_store_name_odk),
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
 
-            config['Shapefile Workspace Store']['publish_count_odk'] = str(1)
-            with open('ini/GeoserverAuth.ini', 'w') as configfile:
-                config.write(configfile)
+
         except:
             # print("Stop layer editing and import again")
             pass
