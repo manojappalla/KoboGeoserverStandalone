@@ -13,7 +13,7 @@ import json
 from PyQt5.QtCore import *
 from Auth import Auth
 from Geoserver import Geoserver
-import psycopg2 as pg
+import psycopg2 as pgs
 
 """
 ********************************* SETUPT ALL THE VARIABLES - START *****************************************************
@@ -46,6 +46,14 @@ pg_workspace_name_odk = config['PostGIS Workspace Store']['workspace_name_odk']
 pg_store_name_odk = config['PostGIS Workspace Store']['store_name_odk']
 no_of_times_pg_published_odk = int(config['PostGIS Workspace Store']['publish_count_odk'])
 
+# POSTGIS VARIABLES
+pg = configparser.ConfigParser()
+pg.read('ini/PgAuth.ini')
+pg_username = pg['PostGIS Credentials']['user']
+pg_password = pg['PostGIS Credentials']['password']
+pg_port = pg['PostGIS Credentials']['port']
+pg_dbname = pg['PostGIS Credentials']['dbname']
+pg_host = pg['PostGIS Credentials']['host']
 """
 ************************************************************************************************************************
 """
@@ -677,12 +685,31 @@ except:
                                KOBO ---> TESTING importData
 *************************************************************************************************
 """
+
+# ALTER THE ODKUUID FIELDNAME TO odkuuid IF IT DOESN'T ALREADY EXIST
+
+conn_string = "host=\'{}\' dbname=\'{}\' user=\'{}\' password=\'{}\'".format(pg_host, pg_dbname, pg_username, pg_password)
+conn = pgs.connect(conn_string)
+cursor = conn.cursor()
+
+cursor.execute("Select * FROM test_pg_odk LIMIT 0")
+colnames = [desc[0] for desc in cursor.description]
+if 'odkuuid' not in colnames:
+    alterTable = """ALTER TABLE test_pg_odk ADD odkuuid varchar(255)""" #Change the table name in this line
+    cursor.execute(alterTable)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+# OPEN THE POSTGIS LAYER AS VECTOR LAYER
+
 uri = QgsDataSourceUri()
 # set host name, port, database name, username and password
-uri.setConnection("localhost", "5432", "KoboOdk", "postgres", "postgres")
+uri.setConnection(pg_host, pg_port, pg_dbname, pg_username, pg_password)
 # set database schema, table name, geometry column and optionally
 # subset (WHERE clause)
-uri.setDataSource("public", "test_pg_odk", "geom")
+uri.setDataSource("public", "test_pg_odk", "geom") # Change the table name here
 
 vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_odk", "postgres")
 
