@@ -652,10 +652,10 @@ conn_string = "host=\'{}\' dbname=\'{}\' user=\'{}\' password=\'{}\'".format(pg_
 conn = pgs.connect(conn_string)
 cursor = conn.cursor()
 
-cursor.execute("Select * FROM table_name LIMIT 0")
+cursor.execute("Select * FROM pg_soil_temp_kobo LIMIT 0") #Change table name
 colnames = [desc[0] for desc in cursor.description]
 if 'odkuuid' not in colnames:
-    alterTable = """ALTER TABLE table_name ADD odkuuid varchar(255)""" #Change the table name in this line
+    alterTable = """ALTER TABLE pg_soil_temp_kobo ADD odkuuid varchar(255)""" #Change the table name in this line
     cursor.execute(alterTable)
     conn.commit()
     cursor.close()
@@ -668,7 +668,7 @@ uri = QgsDataSourceUri()
 uri.setConnection("localhost", "5432", "KoboOdk", "postgres", "postgres")
 # set database schema, table name, geometry column and optionally
 # subset (WHERE clause)
-uri.setDataSource("public", "test_pg_odk", "geom")
+uri.setDataSource("public", "pg_soil_temp_kobo", "geom") #Change table name
 
 vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_odk", "postgres")
 selected_form = kobo['Forms List']['last used']

@@ -478,6 +478,7 @@ class ImportOdk():
             # self.getValue(self.tr('last Submission'),lastSubmission)
         global form_feature_count_odk
         form_feature_count_odk = len(table) # No of submissions in the form
+        print(table)
         return {'response':response1, 'table':table,'lastID':lastSubmission}
 
 
@@ -692,10 +693,10 @@ conn_string = "host=\'{}\' dbname=\'{}\' user=\'{}\' password=\'{}\'".format(pg_
 conn = pgs.connect(conn_string)
 cursor = conn.cursor()
 
-cursor.execute("Select * FROM test_pg_odk LIMIT 0")
+cursor.execute("Select * FROM pg_soil_temp_odk LIMIT 0")
 colnames = [desc[0] for desc in cursor.description]
 if 'odkuuid' not in colnames:
-    alterTable = """ALTER TABLE test_pg_odk ADD odkuuid varchar(255)""" #Change the table name in this line
+    alterTable = """ALTER TABLE pg_soil_temp_odk ADD odkuuid varchar(255)""" #Change the table name in this line
     cursor.execute(alterTable)
     conn.commit()
     cursor.close()
@@ -709,7 +710,7 @@ uri = QgsDataSourceUri()
 uri.setConnection(pg_host, pg_port, pg_dbname, pg_username, pg_password)
 # set database schema, table name, geometry column and optionally
 # subset (WHERE clause)
-uri.setDataSource("public", "test_pg_odk", "geom") # Change the table name here
+uri.setDataSource("public", "pg_soil_temp_odk", "geom") # Change the table name here
 
 vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_odk", "postgres")
 
