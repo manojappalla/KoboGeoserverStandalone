@@ -1,28 +1,28 @@
 <featureType xmlns:ns0="http://www.w3.org/2005/Atom">
-  <name>test</name>
-  <nativeName>test</nativeName>
+  <name>shp_soil_temp_odk</name>
+  <nativeName>shp_soil_temp_odk</nativeName>
   <namespace>
     <name>OdkGeoserverShpWorkspace</name>
     <ns0:link rel="alternate" href="http://localhost:8080/geoserver/rest/namespaces/OdkGeoserverShpWorkspace.xml" type="application/xml" />
   </namespace>
-  <title>test</title>
+  <title>shp_soil_temp_odk</title>
   <keywords>
     <string>features</string>
-    <string>test</string>
+    <string>shp_soil_temp_odk</string>
   </keywords>
   <srs>EPSG:4326</srs>
   <nativeBoundingBox>
-    <minx>78.046281</minx>
-    <maxx>78.0469529</maxx>
-    <miny>30.3398179</miny>
-    <maxy>30.3406007</maxy>
+    <minx>78.030358</minx>
+    <maxx>78.044794</maxx>
+    <miny>30.340793</miny>
+    <maxy>30.375664</maxy>
     <crs>EPSG:4326</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
-    <minx>78.046281</minx>
-    <maxx>78.0469529</maxx>
-    <miny>30.3398179</miny>
-    <maxy>30.3406007</maxy>
+    <minx>78.030358</minx>
+    <maxx>78.044794</maxx>
+    <miny>30.340793</miny>
+    <maxy>30.375664</maxy>
     <crs>EPSG:4326</crs>
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
@@ -59,28 +59,12 @@
       <length>10</length>
     </attribute>
     <attribute>
-      <name>Name</name>
+      <name>temp</name>
       <minOccurs>0</minOccurs>
       <maxOccurs>1</maxOccurs>
       <nillable>true</nillable>
-      <binding>java.lang.String</binding>
-      <length>254</length>
-    </attribute>
-    <attribute>
-      <name>Type</name>
-      <minOccurs>0</minOccurs>
-      <maxOccurs>1</maxOccurs>
-      <nillable>true</nillable>
-      <binding>java.lang.String</binding>
-      <length>254</length>
-    </attribute>
-    <attribute>
-      <name>Image</name>
-      <minOccurs>0</minOccurs>
-      <maxOccurs>1</maxOccurs>
-      <nillable>true</nillable>
-      <binding>java.lang.String</binding>
-      <length>254</length>
+      <binding>java.lang.Double</binding>
+      <length>21</length>
     </attribute>
     <attribute>
       <name>ODKUUID</name>
