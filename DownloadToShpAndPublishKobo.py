@@ -518,6 +518,8 @@ class ImportKobo:
 
             # CODE FOR UPDATING EXTENTS
             elif (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 1):
+                # print("updating extent")
+                layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
                 ext = layer.extent()
                 qminx = ext.xMinimum()
                 qminy = ext.yMinimum()
@@ -525,7 +527,7 @@ class ImportKobo:
                 qmaxy = ext.yMaximum()
 
                 response = requests.get(
-                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo),
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/{}.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo, layer_name),
                     auth=(username_geoserver, password_geoserver))
                 doc = ET.fromstring(response.content)
                 tree = ET.ElementTree(doc)
@@ -543,9 +545,9 @@ class ImportKobo:
                 t = ET.tostring(tree)
                 headers = {'Content-Type': 'application/xml'}
                 requests.put(
-                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo),
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/{}.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo, layer_name),
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
-
+                # print("updated extent")
 
         except:
             # print("Stop layer editing and import again")
