@@ -553,6 +553,7 @@ class ImportOdk():
 
             # CODE FOR UPDATING EXTENTS
             elif (form_feature_count_odk >= 2 and no_of_times_published_odk == 1):
+                # print("updating extent")
                 ext = layer.extent()
                 qminx = ext.xMinimum()
                 qminy = ext.yMinimum()
@@ -560,7 +561,7 @@ class ImportOdk():
                 qmaxy = ext.yMaximum()
 
                 response = requests.get(
-                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_odk, shp_store_name_odk),
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/{}.xml'.format(shp_workspace_name_odk, shp_store_name_odk, last_form_used_odk),
                     auth=(username_geoserver, password_geoserver))
                 doc = ET.fromstring(response.content)
                 tree = ET.ElementTree(doc)
@@ -578,9 +579,9 @@ class ImportOdk():
                 t = ET.tostring(tree)
                 headers = {'Content-Type': 'application/xml'}
                 requests.put(
-                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_odk, shp_store_name_odk),
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/{}.xml'.format(shp_workspace_name_odk, shp_store_name_odk, last_form_used_odk),
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
-
+                # print("updated extent")
 
         except:
             # print("Stop layer editing and import again")
