@@ -560,44 +560,46 @@ class ImportOdk():
                 layer.addFeatures(newQgisFeatures)
 
             # # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
-            # if (form_feature_count_odk >= 2 and no_of_times_published_odk == 0):
-            #     layer_name = shp_path_odk.split('/')[-1].split('.')[0]
-            #     geo.create_datastore(name=shp_store_name_odk, path=shp_path_odk, workspace=shp_workspace_name_odk)
-            #     geo.publish_featurestore(workspace=shp_workspace_name_odk, store_name=shp_store_name_odk, pg_table=layer_name)
+            print(form_feature_count_odk)
+            if (form_feature_count_odk >= 2 and no_of_times_pg_published_odk == 0):
+                geo.create_featurestore(store_name=pg_store_name_odk, workspace=pg_workspace_name_odk,
+                                        db=pg_dbname, host=pg_host, pg_user=pg_username,
+                                        pg_password=pg_password)
+                geo.publish_featurestore(workspace=pg_workspace_name_odk, store_name=pg_store_name_odk, pg_table="pg_soil_temp_odk")  # CHANGE PG TABLE NAME HERE (LAYER NAME IN GEOSERVER)
+                config['PostGIS Workspace Store']['publish_count_odk'] = str(1)
+                with open('ini/GeoserverAuth.ini', 'w') as configfile:
+                    config.write(configfile)
             #
-            # # CODE FOR UPDATING EXTENTS
-            # elif (form_feature_count_odk >= 2 and no_of_times_published_odk == 1):
-            #     ext = layer.extent()
-            #     qminx = ext.xMinimum()
-            #     qminy = ext.yMinimum()
-            #     qmaxx = ext.xMaximum()
-            #     qmaxy = ext.yMaximum()
+            # CODE FOR UPDATING EXTENTS
+            elif (form_feature_count_odk >= 2 and no_of_times_pg_published_odk == 1):
+                ext = layer.extent()
+                qminx = ext.xMinimum()
+                qminy = ext.yMinimum()
+                qmaxx = ext.xMaximum()
+                qmaxy = ext.yMaximum()
+
+                response = requests.get(
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/pg_soil_temp_odk.xml'.format(pg_workspace_name_odk, pg_store_name_odk),
+                    auth=(username_geoserver, password_geoserver))
+                doc = ET.fromstring(response.content)
+                tree = ET.ElementTree(doc)
+
+                for x in tree.findall('nativeBoundingBox'):
+                    x.find('minx').text = str(qminx)
+                    x.find('miny').text = str(qminy)
+                    x.find('maxx').text = str(qmaxx)
+                    x.find('maxy').text = str(qmaxy)
+
+                tree.write('xml/pg_extent_odk.xml')
+
+                tree = ET.parse('xml/pg_extent_odk.xml')
+                tree = tree.getroot()
+                t = ET.tostring(tree)
+                headers = {'Content-Type': 'application/xml'}
+                requests.put(
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/pg_soil_temp_odk.xml'.format(pg_workspace_name_odk, pg_store_name_odk),
+                    auth=(username_geoserver, password_geoserver), headers=headers, data=t)
             #
-            #     response = requests.get(
-            #         'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_odk, shp_store_name_odk),
-            #         auth=(username_geoserver, password_geoserver))
-            #     doc = ET.fromstring(response.content)
-            #     tree = ET.ElementTree(doc)
-            #
-            #     for x in tree.findall('nativeBoundingBox'):
-            #         x.find('minx').text = str(qminx)
-            #         x.find('miny').text = str(qminy)
-            #         x.find('maxx').text = str(qmaxx)
-            #         x.find('maxy').text = str(qmaxy)
-            #
-            #     tree.write('extent_odk.xml')
-            #
-            #     tree = ET.parse('extent_odk.xml')
-            #     tree = tree.getroot()
-            #     t = ET.tostring(tree)
-            #     headers = {'Content-Type': 'application/xml'}
-            #     requests.put(
-            #         'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_odk, shp_store_name_odk),
-            #         auth=(username_geoserver, password_geoserver), headers=headers, data=t)
-            #
-            # config['Shapefile Workspace Store']['publish_count_odk'] = str(1)
-            # with open('ini/GeoserverAuth.ini', 'w') as configfile:
-            #     config.write(configfile)
         except:
             # print("Stop layer editing and import again")
             pass
