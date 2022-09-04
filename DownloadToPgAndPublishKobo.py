@@ -436,6 +436,7 @@ class ImportKobo:
             if len(subList)>0:
                 lastSubmission=max(subList)
             # print({'response':response, 'table':table,'lastID':lastSubmission})
+            # print(table)
             return {'response':response, 'table':table,'lastID':lastSubmission}
         except Exception as e:
             # print("exception occured in gettable",e)
@@ -509,7 +510,7 @@ class ImportKobo:
                                 fieldError = fieldName
 
                     newQgisFeatures.append(qgisFeature)
-
+                    # print(newQgisFeatures)
             except Exception as e:
                 # print('unable to create', e)
                 pass
@@ -519,11 +520,16 @@ class ImportKobo:
             with edit(layer):
                 layer.addFeatures(newQgisFeatures)
 
-            # # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
+            # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
+            # print(form_feature_count_kobo)
             # if (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 0):
-            #     layer_name = shp_path_kobo.split('/')[-1].split('.')[0]
-            #     geo.create_datastore(name=shp_store_name_kobo, path=shp_path_kobo, workspace=shp_workspace_name_kobo)
-            #     geo.publish_featurestore(workspace=shp_workspace_name_kobo, store_name=shp_store_name_kobo, pg_table=layer_name)
+            #     geo.create_featurestore(store_name=pg_store_name_kobo, workspace=pg_workspace_name_kobo,
+            #                             db=pg_dbname, host=pg_host, pg_user=pg_username,
+            #                             pg_password=pg_password)
+            #     geo.publish_featurestore(workspace=pg_workspace_name_kobo, store_name=pg_store_name_kobo, pg_table='pg_soil_temp_kobo') # CHANGE PG TABLE NAME HERE (LAYER NAME IN GEOSERVER)
+            #     config['PostGIS Workspace Store']['publish_count_kobo'] = str(1)
+            #     with open('ini/GeoserverAuth.ini', 'w') as configfile:
+            #         config.write(configfile)
             #
             # # CODE FOR UPDATING EXTENTS
             # elif (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 1):
@@ -555,11 +561,9 @@ class ImportKobo:
             #         'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo),
             #         auth=(username_geoserver, password_geoserver), headers=headers, data=t)
             #
-            # config['Shapefile Workspace Store']['publish_count_kobo'] = str(1)
-            # with open('ini/GeoserverAuth.ini', 'w') as configfile:
-            #     config.write(configfile)
+
         except:
-            # print("Stop layer editing and import again")
+            print("Stop layer editing and import again")
             pass
         self.processingLayer = None
 
@@ -632,10 +636,10 @@ class ImportKobo:
                                KOBO ---> TESTING getFormList
 *************************************************************************************************
 """
-data_odk = ImportKobo()
+data_kobo = ImportKobo()
 
 try:
-    data_odk.getFormList()
+    data_kobo.getFormList()
     # pass
 except:
     print("Invalid credentials entered")
@@ -670,13 +674,13 @@ uri.setConnection("localhost", "5432", "KoboOdk", "postgres", "postgres")
 # subset (WHERE clause)
 uri.setDataSource("public", "pg_soil_temp_kobo", "geom") #Change table name
 
-vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_odk", "postgres")
+vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_kobo", "postgres")
 selected_form = kobo['Forms List']['last used']
 if vlayer.isValid():
     print("Layer is valid")
 else:
     print("layer is not valid")
-data_odk.importData(vlayer, selected_form)
+data_kobo.importData(vlayer, selected_form)
 # try:
 #     while True:
 #         data_odk.importData(vlayer, last_selected_form_id)
