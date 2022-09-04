@@ -601,7 +601,7 @@ class ImportOdk():
                     auth=(username_geoserver, password_geoserver), headers=headers, data=t)
             #
         except:
-            # print("Stop layer editing and import again")
+            print("Stop layer editing and import again")
             pass
         self.processingLayer = None
 

@@ -27,11 +27,13 @@
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
+  <advertised>true</advertised>
   <store class="dataStore">
     <name>OdkGeoserverPgWorkspace:OdkGeoserverPgStore</name>
     <ns0:link rel="alternate" href="http://localhost:8080/geoserver/rest/workspaces/OdkGeoserverPgWorkspace/datastores/OdkGeoserverPgStore.xml" type="application/xml" />
   </store>
   <serviceConfiguration>false</serviceConfiguration>
+  <simpleConversionEnabled>false</simpleConversionEnabled>
   <maxFeatures>0</maxFeatures>
   <numDecimals>0</numDecimals>
   <padWithZeros>false</padWithZeros>
@@ -39,6 +41,7 @@
   <overridingServiceSRS>false</overridingServiceSRS>
   <skipNumberMatched>false</skipNumberMatched>
   <circularArcPresent>false</circularArcPresent>
+  <encodeMeasures>false</encodeMeasures>
   <attributes>
     <attribute>
       <name>geom</name>
