@@ -521,45 +521,45 @@ class ImportKobo:
                 layer.addFeatures(newQgisFeatures)
 
             # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
-            # print(form_feature_count_kobo)
-            # if (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 0):
-            #     geo.create_featurestore(store_name=pg_store_name_kobo, workspace=pg_workspace_name_kobo,
-            #                             db=pg_dbname, host=pg_host, pg_user=pg_username,
-            #                             pg_password=pg_password)
-            #     geo.publish_featurestore(workspace=pg_workspace_name_kobo, store_name=pg_store_name_kobo, pg_table='pg_soil_temp_kobo') # CHANGE PG TABLE NAME HERE (LAYER NAME IN GEOSERVER)
-            #     config['PostGIS Workspace Store']['publish_count_kobo'] = str(1)
-            #     with open('ini/GeoserverAuth.ini', 'w') as configfile:
-            #         config.write(configfile)
+            print(form_feature_count_kobo)
+            if (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 0):
+                geo.create_featurestore(store_name=pg_store_name_kobo, workspace=pg_workspace_name_kobo,
+                                        db=pg_dbname, host=pg_host, pg_user=pg_username,
+                                        pg_password=pg_password)
+                geo.publish_featurestore(workspace=pg_workspace_name_kobo, store_name=pg_store_name_kobo, pg_table='pg_soil_temp_kobo') # CHANGE PG TABLE NAME HERE (LAYER NAME IN GEOSERVER)
+                config['PostGIS Workspace Store']['publish_count_kobo'] = str(1)
+                with open('ini/GeoserverAuth.ini', 'w') as configfile:
+                    config.write(configfile)
             #
             # # CODE FOR UPDATING EXTENTS
-            # elif (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 1):
-            #     ext = layer.extent()
-            #     qminx = ext.xMinimum()
-            #     qminy = ext.yMinimum()
-            #     qmaxx = ext.xMaximum()
-            #     qmaxy = ext.yMaximum()
-            #
-            #     response = requests.get(
-            #         'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo),
-            #         auth=(username_geoserver, password_geoserver))
-            #     doc = ET.fromstring(response.content)
-            #     tree = ET.ElementTree(doc)
-            #
-            #     for x in tree.findall('nativeBoundingBox'):
-            #         x.find('minx').text = str(qminx)
-            #         x.find('miny').text = str(qminy)
-            #         x.find('maxx').text = str(qmaxx)
-            #         x.find('maxy').text = str(qmaxy)
-            #
-            #     tree.write('extent_kobo.xml')
-            #
-            #     tree = ET.parse('extent_kobo.xml')
-            #     tree = tree.getroot()
-            #     t = ET.tostring(tree)
-            #     headers = {'Content-Type': 'application/xml'}
-            #     requests.put(
-            #         'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/test.xml'.format(shp_workspace_name_kobo, shp_store_name_kobo),
-            #         auth=(username_geoserver, password_geoserver), headers=headers, data=t)
+            elif (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 1):
+                ext = layer.extent()
+                qminx = ext.xMinimum()
+                qminy = ext.yMinimum()
+                qmaxx = ext.xMaximum()
+                qmaxy = ext.yMaximum()
+
+                response = requests.get(
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/pg_soil_temp_kobo.xml'.format(pg_workspace_name_kobo, pg_store_name_kobo),
+                    auth=(username_geoserver, password_geoserver))
+                doc = ET.fromstring(response.content)
+                tree = ET.ElementTree(doc)
+
+                for x in tree.findall('nativeBoundingBox'):
+                    x.find('minx').text = str(qminx)
+                    x.find('miny').text = str(qminy)
+                    x.find('maxx').text = str(qmaxx)
+                    x.find('maxy').text = str(qmaxy)
+
+                tree.write('xml/pg_extent_kobo.xml')
+
+                tree = ET.parse('xml/pg_extent_kobo.xml')
+                tree = tree.getroot()
+                t = ET.tostring(tree)
+                headers = {'Content-Type': 'application/xml'}
+                requests.put(
+                    'http://localhost:8080/geoserver/rest/workspaces/{}/datastores/{}/featuretypes/pg_soil_temp_kobo.xml'.format(pg_workspace_name_kobo, pg_store_name_kobo),
+                    auth=(username_geoserver, password_geoserver), headers=headers, data=t)
             #
 
         except:
@@ -574,7 +574,7 @@ class ImportKobo:
         uuidFieldName=None
         QgisFieldsList = [field.name() for field in lyr.fields()]
         for field in QgisFieldsList:
-            if 'UUID' in field:
+            if 'uuid' in field:
                 uuidFieldName =field
         if uuidFieldName:
             # print(uuidFieldName)
