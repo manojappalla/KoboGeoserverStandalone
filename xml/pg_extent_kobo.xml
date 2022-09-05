@@ -12,16 +12,16 @@
   </keywords>
   <srs>EPSG:4326</srs>
   <nativeBoundingBox>
-    <minx>77.905963</minx>
-    <maxx>78.078792</maxx>
-    <miny>30.265244</miny>
+    <minx>77.996179</minx>
+    <maxx>78.092616</maxx>
+    <miny>30.318522</miny>
     <maxy>30.339521</maxy>
     <crs>EPSG:4326</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
-    <minx>78.020046</minx>
-    <maxx>78.078792</maxx>
-    <miny>30.310183</miny>
+    <minx>77.996179</minx>
+    <maxx>78.092616</maxx>
+    <miny>30.318522</miny>
     <maxy>30.339521</maxy>
     <crs>EPSG:4326</crs>
   </latLonBoundingBox>

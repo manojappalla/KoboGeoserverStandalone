@@ -14,6 +14,7 @@ from PyQt5.QtCore import *
 from Auth import Auth
 from Geoserver import Geoserver
 import psycopg2 as pgs
+from time import sleep
 
 """
 ********************************* SETUPT ALL THE VARIABLES - START *****************************************************
@@ -521,7 +522,7 @@ class ImportKobo:
                 layer.addFeatures(newQgisFeatures)
 
             # PUBLISHES ONLY IF THE NO OF SUBMISSIONS IN THE FORM ARE GREATER THAN OR EQUAL TO 2 AND THE NO OF TIMES PUBLISHED COUNT IS 0
-            print(form_feature_count_kobo)
+            # print(form_feature_count_kobo)
             if (form_feature_count_kobo >= 2 and no_of_times_published_kobo == 0):
                 geo.create_featurestore(store_name=pg_store_name_kobo, workspace=pg_workspace_name_kobo,
                                         db=pg_dbname, host=pg_host, pg_user=pg_username,
@@ -677,13 +678,14 @@ uri.setDataSource("public", "pg_soil_temp_kobo", "geom") #Change table name
 vlayer = QgsVectorLayer(uri.uri(False), "pg_layer_kobo", "postgres")
 selected_form = kobo['Forms List']['last used']
 if vlayer.isValid():
-    print("Layer is valid")
+    # print("Layer is valid")
+    pass
 else:
     print("layer is not valid")
-data_kobo.importData(vlayer, selected_form)
-# try:
-#     while True:
-#         data_odk.importData(vlayer, last_selected_form_id)
-# except KeyboardInterrupt:
-#     pass
+# data_kobo.importData(vlayer, selected_form)
+try:
+    while True:
+        data_kobo.importData(vlayer, selected_form)
+except KeyboardInterrupt:
+    pass
 
