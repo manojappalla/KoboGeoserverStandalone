@@ -12,9 +12,9 @@
   </keywords>
   <srs>EPSG:4326</srs>
   <nativeBoundingBox>
-    <minx>78.030358</minx>
+    <minx>78.002198</minx>
     <maxx>78.044794</maxx>
-    <miny>30.340793</miny>
+    <miny>30.335756</miny>
     <maxy>30.375664</maxy>
     <crs>EPSG:4326</crs>
   </nativeBoundingBox>
