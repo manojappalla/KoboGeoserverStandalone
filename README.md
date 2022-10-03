@@ -56,6 +56,9 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
     This file is used import data from the ODK server into the shapefile and publish the layer to GeoServer.
 
 4) This repository also has a folder named xml that hosts four xml files which automatically gets updated by the code and are used to update the extent of the layeri n GeoServer.
+
+![Working Diagram](https://user-images.githubusercontent.com/103551978/193496464-df91582b-af06-4503-8379-9b00f9f498e0.png)
+
 ## Test Results
 
 The above scripts are tested for generating the interpolated maps in real time while the soil temperature values are being collected. The script was successful in importing the data from the server, publising the data to GeoServer, updating the extent and analysing the data. The following is the link to view the screen recording of the working of the script.
