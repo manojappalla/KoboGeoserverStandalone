@@ -57,7 +57,7 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 
 4) This repository also has a folder named xml that hosts four xml files which automatically gets updated by the code and are used to update the extent of the layeri n GeoServer.
 
-5) Woking Diagram
+## Woking Diagram
 
 ![Working Diagram](https://user-images.githubusercontent.com/103551978/193496464-df91582b-af06-4503-8379-9b00f9f498e0.png)
 
