@@ -9,7 +9,7 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 ## Acknowledgements
 
  - [QRealTime (Shiva Reddy Koti, Prabhakar Alok Varma)](https://shivareddyiirs.github.io/QRealTime/)
- 
+ - [geoserver-rest api (Tek Bahadur Kshetri)](https://pypi.org/project/geoserver-rest/)
 
 
 ## Software Used
@@ -37,11 +37,17 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 - #### PgAuth.ini
     This ini file has only one section where the user enters the credentials to connect to the PostGIS table.
 
-2) This repository has four main python files that should be run by the user depending on the requirement.
+2) This repository also holds two python files KoboFormsList.py and OdkFormsList.py
+
+- #### KoboFormsList.py:
+    This python file has the getFormsList function, which is used to fetch the form names and their ids in the selected project in the Kobo Server. An API call is made to get the forms list.
+- #### OdkFormsList.py:
+    This python file has the getFormsList function, which is used to fetch the form names and their ids in the selected project in ODK Central Server. An API call is made to get the forms list.
+
+3) This repository has four main python files that should be run by the user depending on the requirement.
 
 - #### DownloadToPgAndPublishKobo.py: 
     This file is used import data from the Kobo server into the PostGIS database and publish the layer to GeoServer.
-
 - #### DownloadToPgAndPublishOdk.py:
     This file is used import data from the ODK server into the PostGIS database and publish the layer to GeoServer.
 - #### DownloadToShpAndPublishKobo.py:
@@ -49,3 +55,9 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 - #### DownloadToShpAndPublishOdk.py: 
     This file is used import data from the ODK server into the shapefile and publish the layer to GeoServer.
 
+4) This repository also has a folder named xml that hosts four xml files which automatically gets updated by the code and are used to update the extent of the layeri n GeoServer.
+## Test Results
+
+The above scripts are tested for generating the interpolated maps in real time while the soil temperature values are being collected. The script was successful in importing the data from the server, publising the data to GeoServer, updating the extent and analysing the data. The following is the link to view the screen recording of the working of the script.
+
+[YouTube Link of Screen Recording](https://youtu.be/cjuAuGZGh4E)
