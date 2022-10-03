@@ -59,7 +59,8 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 
 ## Woking Diagram
 
-![Working Diagram](https://user-images.githubusercontent.com/103551978/193496464-df91582b-af06-4503-8379-9b00f9f498e0.png)
+![Data Flow Diagram (1)](https://user-images.githubusercontent.com/103551978/193496741-652a662c-3935-4c22-9c9d-17a6b9e54890.png)
+
 
 ## Test Results
 
