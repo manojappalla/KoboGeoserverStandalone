@@ -46,7 +46,7 @@ for i in range(24):
         processing.run('qgis:idwinterpolation', alg_params)
     
     previous_count = new_count
-    # Sleep happily for 10sec
+    # Sleep for 10sec
     sleep(10)
     
     
