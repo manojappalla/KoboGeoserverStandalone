@@ -67,3 +67,12 @@ Data is fuel for research. Humongous amounts of GIS data are being collected, an
 The above scripts are tested for generating the interpolated maps in real time while the soil temperature values are being collected. The script was successful in importing the data from the server, publising the data to GeoServer, updating the extent and analysing the data. The following is the link to view the screen recording of the working of the script.
 
 [YouTube Link of Screen Recording](https://youtu.be/cjuAuGZGh4E)
+
+
+## Note
+
+Install **xmldict** library using pip
+
+```bash
+  pip install xmldict
+```
